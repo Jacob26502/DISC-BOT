@@ -52,7 +52,7 @@ class DiscordBot():
             ##await client.get_channel(payload.channel_id).send("hai")
             if payload.emoji.name == "✅":
                 await payload.member.add_roles(client.get_guild(payload.guild_id).get_role(762809681634132018))
-                print(payload.member.name)
+                print(payload.member.name + " Has just agreed")
                 ##do the thing
             elif payload.emoji.name == "❌":
                 await payload.member.edit(nick="I can't follow rules")
