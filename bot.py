@@ -7,7 +7,7 @@ import urllib.request as urllib
 import random as random
 from icalparse import parse_ical
 from discord.ext import tasks, commands
-
+from checklist import elist
 TOKEN = open("key.txt", "r").read()
 GUILD = '760098399869206529'
 ##client = discord.Client()
@@ -15,7 +15,7 @@ GUILD = '760098399869206529'
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='|',intents=intents)
 ical03=parse_ical()
-
+ls=elist()
 class DiscordBot():
 
 
@@ -35,45 +35,25 @@ class DiscordBot():
     @bot.event
     async def on_raw_reaction_add(payload):
 
-        if payload.message_id == 763433157516066846:  ##main tos
-            if payload.emoji.name == "✅":
-                await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(762809681634132018))
-                print(payload.member.name + " Has just agreed")
-                ##do the thing
-            elif payload.emoji.name == "❌":  ##main tos
-                await payload.member.edit(nick="I can't follow rules")
-        elif payload.message_id == 763866695218495488:  ##event nite
-            if payload.emoji.name == "🐸":
-                await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(763860300784730193))
-                print(payload.member.name + " Joined Event Night")
-        elif payload.message_id == 764154569680617512:  ##trains
-            if payload.emoji.name == "🧦":
-                await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(764155263200264212))
-                print(payload.member.name + " Joined Femboy")
+        for each in ls:
+            if str(payload.message_id) == each[1]:  ##main tos
+                if str(payload.emoji.id) == each[0] or payload.emoji.name == each[0]:
+                    await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(int(each[2])))
+                    print(payload.member.name + " " +each[3])
 
 
 
     @bot.event
     async def on_raw_reaction_remove(payload):
         guild=bot.guilds[0]
-        if payload.message_id == 763433157516066846:   ##main tos
-            if payload.emoji.name == "✅":
-                await guild.get_member(payload.user_id).remove_roles(guild.get_role(762809681634132018))
-            elif payload.emoji.name == "❌":
-                await guild.get_member(payload.user_id).edit(nick=None)
 
-
-        if payload.message_id == 763866695218495488:  ##event nite
-            if payload.emoji.name == "🐸":
-                await guild.get_member(payload.user_id).remove_roles(guild.get_role(763860300784730193))
-                print(guild.get_member(payload.user_id).name + " Left Event Night")
-
-
-        if payload.message_id == 764154569680617512:  ##trains
-            if payload.emoji.name == "🧦":
-                await guild.get_member(payload.user_id).remove_roles(guild.get_role(764155263200264212))
-                print(guild.get_member(payload.user_id).name + " Left Femboy")
-
+        for each in ls:
+            if str(payload.message_id) == each[1]:
+                print("1")   ##main tos
+                if str(payload.emoji.id) == each[0] or str(payload.emoji.name)==each[0]:
+                    print("2")
+                    await guild.get_member(payload.user_id).remove_roles(guild.get_role(int(each[2])))
+                    print(guild.get_member(payload.user_id).name + " " + each[3])
 
 
 bot.run(TOKEN)
