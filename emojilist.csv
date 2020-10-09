@@ -1,2 +1,4 @@
-Emoji ID,Message ID, Role
-1234,12345,123456
+Emoji ID[0],Message ID[1], Role ID[2], positive message[3], negative message[4], emoji used[5]
+764246431363629106,763433157516066846,762809681634132018,Has just agreed to TOS,Has just disagreed to TOS, green tick
+764249241764888588,763866695218495488,763860300784730193,Joined event night,Left event night, frog
+764249503351832576,764154569680617512,764155263200264212,Joined Femsoc,Left Femsoc, socks
