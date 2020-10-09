@@ -19,7 +19,6 @@ tmpvar=""
 scheduler = sched.scheduler(time.time, time.sleep)
 class DiscordBot():
 
-pr()
     @bot.event
     async def on_ready():
         bot.add_cog(MyCog())
