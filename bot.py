@@ -5,69 +5,75 @@ from PIL import Image
 import io
 import urllib.request as urllib
 import random as random
-##from discord.ext import bot
-##TOKEN = os.getenv('DISCORD_TOKEN')
-TOKEN = 'NzYyNzY0OTYwODQ1MDA0ODUx.X3t6Og.CCu7deCrtrYA0pnLwjLR3Tf4FI8'
-GUILD = '760098399869206529'
-client = discord.Client()
-intents = discord.Intents.all()
-client = discord.Client(intents=intents)
-class DiscordBot():
-    
+from icalparse import parse_ical
+from discord.ext import tasks, commands
 
-    @client.event
+TOKEN = open("key.txt", "r").read()
+GUILD = '760098399869206529'
+##client = discord.Client()
+##client = discord.Client(intents=intents)
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix='|',intents=intents)
+ical03=parse_ical()
+
+class DiscordBot():
+
+
+    @bot.event
     async def on_ready():
-        
+
         print(
-            client.user
+            bot.user
         )
 
-    @client.event
+    @bot.event
     async def on_message(message):
-        if message.author == client.user:
+        if message.author == bot.user:
             return
         if message.content.startswith('|test'):
             await message.channel.send("success")
-            
-    @client.event
+    @bot.event
     async def on_raw_reaction_add(payload):
 
-##        if payload.channel_id==763016400872013834:
-##            channel = client.get_channel(763016400872013834)
-##            message = await channel.fetch_message(payload.message_id)
-##            reaction = discord.utils.get(message.reactions, emoji="✅")
-##            if reaction.count==1:
-##                url=message.attachments[0].url.replace("https","http")
-##                request=urllib.request(url)
-##                im = Image.open(urllib.urlopen(request))
-##                bytes_array = io.BytesIO()
-##                im.save(bytes_array)
-##                bytes_array = bytes_array.getvalue()
-##                print(url)
-##                print(bytes_array)
-##                await message.guild.create_custom_emoji(name=str(random.randint(0,99)), image = data)
-##                
-
-        if payload.message_id == 763433157516066846:
-            ##await client.get_channel(payload.channel_id).send("hai")
+        if payload.message_id == 763433157516066846:  ##main tos
             if payload.emoji.name == "✅":
-                await payload.member.add_roles(client.get_guild(payload.guild_id).get_role(762809681634132018))
+                await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(762809681634132018))
                 print(payload.member.name + " Has just agreed")
                 ##do the thing
-            elif payload.emoji.name == "❌":
+            elif payload.emoji.name == "❌":  ##main tos
                 await payload.member.edit(nick="I can't follow rules")
-        
+        elif payload.message_id == 763866695218495488:  ##event nite
+            if payload.emoji.name == "🐸":
+                await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(763860300784730193))
+                print(payload.member.name + " Joined Event Night")
+        elif payload.message_id == 764154569680617512:  ##trains
+            if payload.emoji.name == "🧦":
+                await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(764155263200264212))
+                print(payload.member.name + " Joined Femboy")
 
-    @client.event
+
+
+    @bot.event
     async def on_raw_reaction_remove(payload):
-        if payload.message_id == 763433157516066846:
-            guild=client.guilds[0]
+        guild=bot.guilds[0]
+        if payload.message_id == 763433157516066846:   ##main tos
             if payload.emoji.name == "✅":
                 await guild.get_member(payload.user_id).remove_roles(guild.get_role(762809681634132018))
             elif payload.emoji.name == "❌":
                 await guild.get_member(payload.user_id).edit(nick=None)
 
 
+        if payload.message_id == 763866695218495488:  ##event nite
+            if payload.emoji.name == "🐸":
+                await guild.get_member(payload.user_id).remove_roles(guild.get_role(763860300784730193))
+                print(guild.get_member(payload.user_id).name + " Left Event Night")
 
-    
-client.run(TOKEN)
+
+        if payload.message_id == 764154569680617512:  ##trains
+            if payload.emoji.name == "🧦":
+                await guild.get_member(payload.user_id).remove_roles(guild.get_role(764155263200264212))
+                print(guild.get_member(payload.user_id).name + " Left Femboy")
+
+
+
+bot.run(TOKEN)
