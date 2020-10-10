@@ -49,9 +49,7 @@ class DiscordBot():
 
         for each in ls:
             if str(payload.message_id) == each[1]:
-                print("1")   ##main tos
                 if str(payload.emoji.id) == each[0] or str(payload.emoji.name)==each[0]:
-                    print("2")
                     await guild.get_member(payload.user_id).remove_roles(guild.get_role(int(each[2])))
                     print(guild.get_member(payload.user_id).name + " " + each[3])
 
