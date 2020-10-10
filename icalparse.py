@@ -5,7 +5,7 @@ import time
 global time001
 global toby
 time001=int(time.time())
-toby=100000000000
+future=[]
 def parse_ical():
     global time001
     global toby
@@ -56,10 +56,8 @@ def parse_ical():
     ##return soonest
     for v4,a in enumerate(ical03):
         a[0]=int(datetime.datetime.timestamp(parser.isoparse(a[0])))
-        if int(a[0])-int(time001) > 0  and int(a[0])<int(toby):
-            toby=int(a[0])
+        if int(a[0])-int(time001) > 0:     ##if the time of the meeting - now is > 0 meaning it's in the future and it's the latest event
             next_event=ical03[v4]
+            future.append(a)
 
-            
-    return next_event,(int(toby)-int(time001))
-
+    return future    ##returns as [unix,online delivery,course desc, course code]
