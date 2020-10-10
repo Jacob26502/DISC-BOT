@@ -1,3 +1,4 @@
 
 key.txt
 __pycache__/checklist.cpython-39.pyc
+*.pyc

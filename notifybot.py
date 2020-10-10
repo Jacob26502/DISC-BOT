@@ -4,7 +4,8 @@ import discord
 from PIL import Image
 import io
 from icalparse import parse_ical
-import sched, time, datetime
+import sched, time
+from datetime import datetime
 from discord.ext import tasks, commands
 ##from discord.ext import bot
 ##TOKEN = os.getenv('DISCORD_TOKEN')
@@ -13,8 +14,16 @@ GUILD = '760098399869206529'
 intents = discord.Intents.all()
 ##client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix='|',intents=intents)
+
+######################################################
+urlfile=open("urlkey.csv", mode="r").read().split("\n")
+urlkey=[]
+for x in urlfile:
+    urlkey.append(x.split(","))
+del urlkey[-1]
 ######################################################
 print(time.time())
+future =[]
 tmpvar=""
 scheduler = sched.scheduler(time.time, time.sleep)
 class DiscordBot():
@@ -65,11 +74,30 @@ class MyCog(commands.Cog):
 
     @tasks.loop(seconds=60.0)
     async def timecheck(self):
-        timedelta=parse_ical()
-        print(timedelta[1])
-        if timedelta[1]<=6000:
-            self.createmsg.start()
+        global future,future5
+        future=parse_ical()
+        future5=future[0:5]
+        await self.richifier(future5)
+            ##self.createmsg.start()
 
+    async def richifier(self,future5):  ## future 5 is [unix,online delivery,course desc, course code]
+        for count,each in enumerate(future5):        #adding +[course info url] at [4]
+            for x in urlkey:
+                if x[0]==each[3]:
+                    future5[count].append(x[1])
+            if each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Friday":
+                future5[count][1]="Space Cadets"
+            elif each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
+                future5[count][1]="FAQ Session"
+            elif each[3]=="COMP1215" and (datetime.fromtimestamp(each[0]).strftime("%A")=="Friday" or datetime.fromtimestamp(each[0]).strftime("%A")=="Monday"):
+                future5[count][1]="Excerise sheet help/Discussion"
+            elif each[3]=="COMP1205":
+                future5[count][1]="see homepage for info"
+            elif each[3]=="COMP1203" and datetime.fromtimestamp(each[0]).strftime("%A")=="Friday":
+                future5[count][1]="Q&A session/summarise the week's lectures"
+            elif each[3]=="COMP1203" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
+                future5[count][1]="To help with our RasPi coursework"
+            ##HERERERERERER
 
 
 
