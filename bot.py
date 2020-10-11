@@ -170,4 +170,4 @@ class MyCog(commands.Cog):
             pass
 
 ####################################################################################
-bot.run(TOKEN, reconnect=TRUE)
+bot.run(TOKEN, reconnect=True)
