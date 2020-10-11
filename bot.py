@@ -84,9 +84,9 @@ class DiscordBot():
         ls=elist()
         print("emojilist reloaded")
 ######################################################
-@bot.event
-async def on_resumed():
-    print('reconnected')
+#@bot.event
+#async def on_resumed():
+#    print('reconnected')
 
 
 
