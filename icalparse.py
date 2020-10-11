@@ -4,11 +4,22 @@ import datetime
 import time
 global time001
 global toby
+global ical03
 time001=int(time.time())
+global future
 future=[]
+
+
+
+
+def sortbystring(ls):
+    return int(ls[0])
+
+
 def parse_ical():
     global time001
     global toby
+    global ical03
     time001=int(time.time())
     toby=100000000000
     ical00 = open("ical01.ics").read().split("\n")
@@ -52,12 +63,18 @@ def parse_ical():
         else:
             ical03[v2].append("")
     ##time zone convert
-
-    ##return soonest
+##add a custom event
+    ical03.append(open("TESTLECTURE.csv",mode="r").read().split("\n")[1].split(","))
+    global future
+    future=[]
+    ##return all events in the future
     for v4,a in enumerate(ical03):
         a[0]=int(datetime.datetime.timestamp(parser.isoparse(a[0])))
         if int(a[0])-int(time001) > 0:     ##if the time of the meeting - now is > 0 meaning it's in the future and it's the latest event
             next_event=ical03[v4]
             future.append(a)
 
-    return future    ##returns as [unix,online delivery,course desc, course code]
+    future=sorted(future,key = sortbystring)
+    future=future[0:5]
+
+    return future    ##returns as [unix,online delivery,course desc, course code] including text or custom lecture
