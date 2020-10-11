@@ -83,7 +83,10 @@ class DiscordBot():
         global ls
         ls=elist()
         print("emojilist reloaded")
-
+######################################################
+@bot.event
+async def on_resumed():
+    print('reconnected')
 
 
 
@@ -167,4 +170,4 @@ class MyCog(commands.Cog):
             pass
 
 ####################################################################################
-bot.run(TOKEN)
+bot.run(TOKEN, reconnect=TRUE)
