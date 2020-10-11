@@ -128,6 +128,7 @@ class MyCog(commands.Cog):
     async def createmsg(self,futurenow):
         global lecturetime
         embedVar = discord.Embed(title=("Lecture: "+ futurenow[2] + "  in "+str(round(((time.time()-futurenow[0])/60)))+ "mins"), description=futurenow[1], color=0x16C500)
+        embedVar.add_field(name="Dear, ", value="""<@&764601237986738197>""", inline=False)
         embedVar.add_field(name="Course Homepage", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[4]))+")", inline=False)
         embedVar.add_field(name="Online Lecture Location", value="[Click here to go to the Lecture (if available)]"+"("+("https://waa.ai/"+urlshort(futurenow[5]))+")", inline=False)
         if futurenow[3]=="COMP1202":
@@ -142,7 +143,10 @@ class MyCog(commands.Cog):
         elif futurenow[3]=="COMP1215":
             embedVar.set_thumbnail(url="https://i.imgur.com/bFvcT3Y.png")
             embedVar.add_field(name="For more info please go to", value="""<#764590723545694248>""", inline=False)
-        await bot.get_channel(762778215286177824).send(embed=embedVar)
+        else:
+            embedVar.set_thumbnail(url="https://i.imgur.com/8LQCEa7.png")
+            embedVar.add_field(name="For more info please go to", value="""<#762719395763322960>""", inline=False)
+        await bot.get_channel(764657412585816084).send(embed=embedVar)
         time.sleep(600)
         lecturetime=False
         self.createmsg.stop()
