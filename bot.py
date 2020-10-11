@@ -129,7 +129,7 @@ class MyCog(commands.Cog):
         global lecturetime
         embedVar = discord.Embed(title=("Lecture: "+ futurenow[2] + "  in "+str(round(((time.time()-futurenow[0])/60)))+ "mins"), description=futurenow[1], color=0x16C500)
         embedVar.add_field(name="Course Homepage", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[4]))+")", inline=False)
-        embedVar.add_field(name="Online Lecture Location", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[5]))+")", inline=False)
+        embedVar.add_field(name="Online Lecture Location", value="[Click here to go to the Lecture (if available)]"+"("+("https://waa.ai/"+urlshort(futurenow[5]))+")", inline=False)
         if futurenow[3]=="COMP1202":
             embedVar.set_thumbnail(url="https://i.imgur.com/eRgMUFx.png")
             embedVar.add_field(name="For more info please go to", value="""<#764590654448861185>""", inline=False)
