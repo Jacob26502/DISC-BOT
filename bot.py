@@ -115,7 +115,7 @@ class DiscordBot():
     async def on_message(message):
         if message.author == bot.user:
             return
-        if random.randint(0,200) == 42:
+        elif random.randint(0,200) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
 #######################################################
