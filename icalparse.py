@@ -32,8 +32,8 @@ def parse_ical():
             continue
         else:
             ical01.append(x0)
-
-
+    #print("ical01")
+    #print(ical01)
     for v0,y in enumerate(ical01):
 
         if search("DTSTART",y):
@@ -41,14 +41,16 @@ def parse_ical():
             ical02[-1]=ical02[-1].split("|")
         else:
             continue
-
+    #print("ical02")
+    #print(ical02)
     for v1,z in enumerate(ical02):
-        if (z[1] != "LOCATION:Online Delivery") or (search("Weekly Tutorial",z[2])!=None) or (search("ELEC",z[2])!=None):
-            del(ical02[v1])
+        if ((z[1] != "LOCATION:Online Delivery") or (search("Weekly Tutorial",z[2])!=None) or (search("ELEC",z[2])!=None)):
+            ##del(ical02[v1])
             continue
         else:
             ical03.append(z)
-
+    #print("ical03")
+    #print(ical03)
     for v2,x1 in enumerate(ical03):
         for v3,y in enumerate(x1):
             ical03[v2][v3]=y[y.find(":")+1:]
