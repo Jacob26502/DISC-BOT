@@ -18,6 +18,7 @@ GUILD = '760098399869206529'
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='|',intents=intents)
 ls=elist()
+c=False
 #################################################################
 urlfile=open("urlkey.csv", mode="r").read().split("\n")
 urlkey=[]
@@ -70,7 +71,6 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
 
 
 
-
 ###################################################################
 class DiscordBot():
     @bot.event
@@ -84,9 +84,29 @@ class DiscordBot():
         ls=elist()
         print("emojilist reloaded")
 ######################################################
-#@bot.event
-#async def on_resumed():
-#    print('reconnected')
+    @bot.command(name='cumlord',pass_context = True)
+    async def cumlord(ctx):
+        print("A coomer tried to Coom")
+        c=False
+        for x in ctx.message.author.roles:
+            if x.id == 765936114841288855:
+                c=True
+                break
+            else:
+                pass
+        if c==False:
+            print("They Succeeded")
+            await ctx.message.author.add_roles(bot.get_guild(int(GUILD)).get_role(765936114841288855))
+            await ctx.message.channel.send(ctx.message.author.name + " has Coomed")
+        c=False
+#####################################################
+    @bot.command(name='next5',pass_context = True)
+    async def next5(ctx):
+        for x in richifier(parse_ical()):
+            await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
+        time.sleep(600)
+#################################################
+
 
 
 
@@ -95,9 +115,9 @@ class DiscordBot():
     async def on_message(message):
         if message.author == bot.user:
             return
-        if message.content.startswith('|test'):
-            await message.channel.send("success")
-        await bot.process_commands(message)
+        if random.randint(0,200) == 42:
+            print("Someone got Lucky")
+            await message.channel.send("Kettle-BOT is always watching")
 #######################################################
     @bot.event
     async def on_raw_reaction_add(payload):
@@ -162,6 +182,7 @@ class MyCog(commands.Cog):
         future=[]
         future=parse_ical()
         future=richifier(future)
+        #print(future)
         if future[0][0]-int(time.time())<=600 and future[0][0]-int(time.time())>0 and lecturetime==False:
             lecturetime=True
             print("lecture")
