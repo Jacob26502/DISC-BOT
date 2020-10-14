@@ -118,6 +118,7 @@ class DiscordBot():
         elif random.randint(0,200) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
+        await message.channel.send("Kettle-BOT is always watching")
 #######################################################
     @bot.event
     async def on_raw_reaction_add(payload):
