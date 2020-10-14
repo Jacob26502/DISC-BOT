@@ -1,0 +1,44 @@
+What we need
+
+
+
+
+
+
+
+a bot that can notify the relevant people just before they have a lecture
+
+  grab the next lecture
+
+
+
+
+to give a link if one is appropriate
+
+
+
+
+
+
+to also be able to give updates on the status of the Lecture
+
+
+
+
+
+to cancel when a lecture is
+
+
+
+to tell someone what/when their next lecture is
+
+  a command that grabs the next lecture and prints it
+
+
+
+
+what I need:
+bot needs all future lecture infos
+the lecture list needs to be updated with more information (status, url, work due perhaps, extra info)
+
+be able to give info on the lecturers and lectures

@@ -1,5 +1,4 @@
 # bot.py
-#################################################################
 import os
 import discord
 from PIL import Image
@@ -8,34 +7,29 @@ from icalparse import parse_ical
 import sched, time
 from datetime import datetime
 from discord.ext import tasks, commands
-import random as random
-from emojilist import elist
 from wakari import urlshort
-#################################################################
-global lecturetime, ls
+#############################################################
 TOKEN = open("key.txt", "r").read()
 GUILD = '760098399869206529'
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='|',intents=intents)
-ls=elist()
-#################################################################
+######################################################
 urlfile=open("urlkey.csv", mode="r").read().split("\n")
 urlkey=[]
 for x in urlfile:
     urlkey.append(x.split(","))
 del urlkey[-1]
-#################################################################
-
+######################################################
 future =[]
 tmpvar=""
+global lecturetime
 lecturetime=False
 
 global future6
-#################################################################
-
+######################################################
 print(time.time())
 scheduler = sched.scheduler(time.time, time.sleep)
-##################################################################
+########################################################
 def richifier(future6):  ## future 5 is [unix,online delivery,course desc, course code]
     global lecturetime
     for count,each in enumerate(future6):        #adding +[course info url] at [4]
@@ -53,7 +47,7 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
             future6[count].append("https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_190675_1&mode=view")
         elif each[3]=="COMP1205":
             future6[count][1]="see homepage for info (NO LINK TO MEETING (SHOULD BE ON TEAMS))"
-            future6[count].append("https://waa.ai/udrj")
+            future6[count].append("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         elif each[3]=="COMP1203" and datetime.fromtimestamp(each[0]).strftime("%A")=="Friday":
             future6[count][1]="Q&A session/summarise the week's lectures"
             future6[count].append("https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_191256_1&mode=cpview")
@@ -63,97 +57,73 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
         else:
             continue
     return future6
-###################################################################
-
-
-
-
-
-
-
-###################################################################
+            ##HERERERERERER
+########################################################
 class DiscordBot():
+
     @bot.event
     async def on_ready():
         bot.add_cog(MyCog())
         print(bot.user)
-#####################################################
-    @bot.command(name='emlist')
-    async def emlist(ctx, *args):
-        global ls
-        ls=elist()
-        print("emojilist reloaded")
-######################################################
-#@bot.event
-#async def on_resumed():
-#    print('reconnected')
+        guild01=bot.guilds[0]
+
+#
+    # @bot.command(name='test')
+    # async def test(ctx, *args):
+        # global tmpvar
+        # tmpvar=str(args)
+        # print(tmpvar)
+        # await MyCog.createmsg(commands.Cog)
+        ##await ctx.send('{} arguments: {}'.format(len(args), ', '.join(args)))
 
 
-
-#####################################################
     @bot.event
     async def on_message(message):
+        global tmpvar
         if message.author == bot.user:
             return
-        if message.content.startswith('|test'):
-            await message.channel.send("success")
+        if message.content.startswith('|alert'):
+            embedVar = discord.Embed(title="Lecture Starting", description="Desc", color=0x00ff00)
+            embedVar.add_field(name="Field1", value="hi", inline=False)
+            embedVar.add_field(name="Field2", value="hi2", inline=False)
+            await message.channel.send(tmpvar)
+            ##await message.channel.send(embed=embedVar)
+            ##await message.channel.send(sched_test())
         await bot.process_commands(message)
-#######################################################
-    @bot.event
-    async def on_raw_reaction_add(payload):
 
-        for each in ls:
-            if str(payload.message_id) == each[1]:  ##idk tbh
-                if str(payload.emoji.id) == each[0] or payload.emoji.name == each[0]:
-                    await payload.member.add_roles(bot.get_guild(payload.guild_id).get_role(int(each[2])))
-                    print(payload.member.name + " " +each[3])
-##########################################################
-    @bot.event
-    async def on_raw_reaction_remove(payload):
-        guild=bot.guilds[0]
 
-        for each in ls:
-            if str(payload.message_id) == each[1]:
-                if str(payload.emoji.id) == each[0] or str(payload.emoji.name)==each[0]:
-                    await guild.get_member(payload.user_id).remove_roles(guild.get_role(int(each[2])))
-                    print(guild.get_member(payload.user_id).name + " " + each[4])
-#####################################################################################
+
 
 class MyCog(commands.Cog):
     def __init__(self):
         self.index = 0
         self.timecheck.start()
-#########################################################################################
+
     def cog_unload(self):
         self.timecheck.cancel()
-##########################################################################################
+
     @tasks.loop(count=None)
     async def createmsg(self,futurenow):
         global lecturetime
         embedVar = discord.Embed(title=("Lecture: "+ futurenow[2] + "  in "+str(round(((time.time()-futurenow[0])/60)))+ "mins"), description=futurenow[1], color=0x16C500)
-        embedVar.add_field(name="Dear, ", value="""<@&764601237986738197>""", inline=False)
         embedVar.add_field(name="Course Homepage", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[4]))+")", inline=False)
-        embedVar.add_field(name="Online Lecture Location", value="[Click here to go to the Lecture (if available)]"+"("+("https://waa.ai/"+urlshort(futurenow[5]))+")", inline=False)
-        if futurenow[3]=="COMP1202":
+        embedVar.add_field(name="Online Lecture Location", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[5]))+")", inline=False)
+        if futurenow[3]=="COMP1202"
             embedVar.set_thumbnail(url="https://i.imgur.com/eRgMUFx.png")
-            embedVar.add_field(name="For more info please go to", value="""<#764590654448861185>""", inline=False)
-        elif futurenow[3]=="COMP1203":
+        elif futurenow[3]=="COMP1203"
             embedVar.set_thumbnail(url="https://i.imgur.com/TR6iwwz.png")
-            embedVar.add_field(name="For more info please go to", value="""<#764590676049395723>""", inline=False)
-        elif futurenow[3]=="COMP1205":
+        elif futurenow[3]=="COMP1205"
             embedVar.set_thumbnail(url="https://i.imgur.com/HMTSDDb.png")
-            embedVar.add_field(name="For more info please go to", value="""<#764590696128446484>""", inline=False)
-        elif futurenow[3]=="COMP1215":
+        elif futurenow[3]=="COMP1215"
             embedVar.set_thumbnail(url="https://i.imgur.com/bFvcT3Y.png")
-            embedVar.add_field(name="For more info please go to", value="""<#764590723545694248>""", inline=False)
-        else:
-            embedVar.set_thumbnail(url="https://i.imgur.com/8LQCEa7.png")
-            embedVar.add_field(name="For more info please go to", value="""<#762719395763322960>""", inline=False)
-        await bot.get_channel(764657412585816084).send(embed=embedVar)
+        await bot.get_channel(762778215286177824).send(embed=embedVar)
         time.sleep(600)
         lecturetime=False
         self.createmsg.stop()
-#####################################################################################################
+
+
+
+
 
     @tasks.loop(seconds=60.0)
     async def timecheck(self):
@@ -167,7 +137,14 @@ class MyCog(commands.Cog):
             print("lecture")
             self.createmsg.start(future[0])
         else:
-            pass
+            print("no lecture")
 
-####################################################################################
-bot.run(TOKEN, reconnect=True)
+            ##await self.createmsg(future[0])
+            ##self.createmsg.start()
+
+
+
+
+
+
+bot.run(TOKEN)
