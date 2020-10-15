@@ -7,10 +7,12 @@ import io
 from icalparse import parse_ical
 import sched, time
 from datetime import datetime
+from discord.ext.commands import cooldown
 from discord.ext import tasks, commands
 import random as random
 from emojilist import elist
 from wakari import urlshort
+import asyncio
 #################################################################
 global lecturetime, ls
 TOKEN = open("key.txt", "r").read()
@@ -48,7 +50,10 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
             future6[count].append("https://teams.microsoft.com/l/channel/19%3aa96eb5721aef41099e19690b93c27ab7%40thread.tacv2/Space%2520Cadets%2520(Fri%252016-18)?groupId=143e2cc4-76a6-42e4-95d9-a25c1afd59f6&tenantId=4a5378f9-29f4-4d3e-be89-669d03ada9d8")                                                    ##ALSO adds the link to slot [5]
         elif each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
             future6[count][1]="FAQ Session"
-            future6[count].append("https://teams.microsoft.com/l/channel/19%3a61c53c060b62424b8567ba96ab71b16a%40thread.tacv2/FAQ%2520(Mon%252011-12)?groupId=143e2cc4-76a6-42e4-95d9-a25c1afd59f6&tenantId=4a5378f9-29f4-4d3e-be89-669d03ada9d8")
+            future6[count].append("https://waa.ai/u6DT")
+        elif each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Thursday":
+            future6[count][1]="Labs"
+            future6[count].append("https://waa.ai/u6D3")
         elif each[3]=="COMP1215" and (datetime.fromtimestamp(each[0]).strftime("%A")=="Friday" or datetime.fromtimestamp(each[0]).strftime("%A")=="Monday"):
             future6[count][1]="Excerise sheet help/Discussion"
             future6[count].append("https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_190675_1&mode=view")
@@ -100,11 +105,11 @@ class DiscordBot():
             await ctx.message.channel.send(ctx.message.author.name + " has Coomed")
         c=False
 #####################################################
+    @cooldown(1,600)
     @bot.command(name='next5',pass_context = True)
     async def next5(ctx):
         for x in richifier(parse_ical()):
             await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
-        time.sleep(600)
 #################################################
 
 
@@ -118,7 +123,7 @@ class DiscordBot():
         elif random.randint(0,200) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
-        await message.channel.send("Kettle-BOT is always watching")
+        await bot.process_commands(message)
 #######################################################
     @bot.event
     async def on_raw_reaction_add(payload):
@@ -170,8 +175,9 @@ class MyCog(commands.Cog):
         else:
             embedVar.set_thumbnail(url="https://i.imgur.com/8LQCEa7.png")
             embedVar.add_field(name="For more info please go to", value="""<#762719395763322960>""", inline=False)
-        await bot.get_channel(764657412585816084).send(embed=embedVar)
-        time.sleep(600)
+        ##await bot.get_channel(764657412585816084).send(embed=embedVar)
+        await bot.get_channel(762778215286177824).send(embed=embedVar)
+        await asyncio.sleep(600)
         lecturetime=False
         self.createmsg.stop()
 #####################################################################################################
