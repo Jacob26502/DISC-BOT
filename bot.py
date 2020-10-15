@@ -120,7 +120,7 @@ class DiscordBot():
     async def on_message(message):
         if message.author == bot.user:
             return
-        elif random.randint(0,200) == 42:
+        elif random.randint(0,400) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
         await bot.process_commands(message)
@@ -167,7 +167,7 @@ class MyCog(commands.Cog):
             embedVar.set_thumbnail(url="https://i.imgur.com/TR6iwwz.png")
             embedVar.add_field(name="For more info please go to", value="""<#764590676049395723>""", inline=False)
         elif futurenow[3]=="COMP1205":
-            embedVar.set_thumbnail(url="https://i.imgur.com/HMTSDDb.png")
+            embedVar.set_thumbnail(url="https://i.imgur.com/3l2tbv7.gif")
             embedVar.add_field(name="For more info please go to", value="""<#764590696128446484>""", inline=False)
         elif futurenow[3]=="COMP1215":
             embedVar.set_thumbnail(url="https://i.imgur.com/bFvcT3Y.png")
