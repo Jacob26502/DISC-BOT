@@ -12,6 +12,7 @@ from discord.ext import tasks, commands
 import random as random
 from emojilist import elist
 from wakari import urlshort
+from mcstats import mcstat
 import asyncio
 #################################################################
 global lecturetime, ls
@@ -112,7 +113,26 @@ class DiscordBot():
             await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
 #################################################
 
+    @bot.command(name='flip',pass_context = True)
+    async def flip(ctx):
+        if random.randint(0,1) == 1:
+            await ctx.message.channel.send("Heads")
+        else:
+            await ctx.message.channel.send("Tails")
+########################################################
+    @bot.command(name='do',pass_context = True)
+    async def do(ctx, *, arg):
+            await ctx.message.channel.send("Kettle-BOT did "+ str(arg))
+#######################################################################
 
+    @bot.command(name='bonk',pass_context = True)
+    async def bonk(ctx, *, arg):
+            await ctx.message.channel.send(str(arg)+" was Bonked!!")
+#######################################################################
+
+    @bot.command(name='pp',pass_context = True)
+    async def help(ctx, *, arg):
+            await ctx.message.channel.send("Kettle-BOT Helped!")
 
 
 #####################################################
@@ -120,7 +140,7 @@ class DiscordBot():
     async def on_message(message):
         if message.author == bot.user:
             return
-        elif random.randint(0,400) == 42:
+        elif random.randint(0,690) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
         await bot.process_commands(message)
@@ -149,6 +169,7 @@ class MyCog(commands.Cog):
     def __init__(self):
         self.index = 0
         self.timecheck.start()
+        self.editmcstat.start()
 #########################################################################################
     def cog_unload(self):
         self.timecheck.cancel()
@@ -175,8 +196,7 @@ class MyCog(commands.Cog):
         else:
             embedVar.set_thumbnail(url="https://i.imgur.com/8LQCEa7.png")
             embedVar.add_field(name="For more info please go to", value="""<#762719395763322960>""", inline=False)
-        ##await bot.get_channel(764657412585816084).send(embed=embedVar)
-        await bot.get_channel(762778215286177824).send(embed=embedVar)
+        await bot.get_channel(764657412585816084).send(embed=embedVar)
         await asyncio.sleep(600)
         lecturetime=False
         self.createmsg.stop()
@@ -196,6 +216,24 @@ class MyCog(commands.Cog):
             self.createmsg.start(future[0])
         else:
             pass
+###############################################################################################
+
+    @tasks.loop(seconds=60.0)
+    async def editmcstat(self):
+        mc=mcstat()
+        ebvar = discord.Embed(title=("Minecraft server Stats"), description="Running: "+ mc[3], color=0x16C500)
+        ebvar.add_field(name="Online?", value=mc[0], inline=False)
+        ebvar.add_field(name="IP:", value=mc[2], inline=False)
+        ebvar.add_field(name="Players:", value=str(mc[1].get("online"))+" out of "+str(mc[1].get("max"))+ " online.", inline=False)
+
+        msg=await bot.get_channel(760099567391342653).fetch_message(767124576542785556)
+        await msg.edit(content = None, embed=ebvar)
+
+
+
+
+
+
 
 ####################################################################################
 bot.run(TOKEN, reconnect=True)
