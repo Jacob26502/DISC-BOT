@@ -16,7 +16,6 @@ from mcstats import mcstat
 import asyncio
 #################################################################
 global lecturetime, ls
-TOKEN = open("key.txt", "r").read()
 GUILD = '760098399869206529'
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='|',intents=intents)
@@ -58,6 +57,9 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
         elif each[3]=="COMP1215" and (datetime.fromtimestamp(each[0]).strftime("%A")=="Friday" or datetime.fromtimestamp(each[0]).strftime("%A")=="Monday"):
             future6[count][1]="Excerise sheet help/Discussion"
             future6[count].append("https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_190675_1&mode=view")
+        elif each[3]=="COMP1205"and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
+            future6[count][1]="Group Project with Sarah (meeting now on BB)"
+            future6[count].append("https://waa.ai/uNPW")
         elif each[3]=="COMP1205":
             future6[count][1]="see homepage for info (NO LINK TO MEETING (SHOULD BE ON TEAMS))"
             future6[count].append("https://waa.ai/udrj")
@@ -122,16 +124,16 @@ class DiscordBot():
 ########################################################
     @bot.command(name='do',pass_context = True)
     async def do(ctx, *, arg):
-            await ctx.message.channel.send("Kettle-BOT did "+ str(arg))
+            await ctx.message.channel.send("Kettle-BOT did "+ discord.utils.escape_mentions(str(arg)))
 #######################################################################
 
     @bot.command(name='bonk',pass_context = True)
     async def bonk(ctx, *, arg):
-            await ctx.message.channel.send(str(arg)+" was Bonked!!")
+            await ctx.message.channel.send(discord.utils.escape_mentions(str(arg))+" was Bonked!!")
 #######################################################################
 
-    @bot.command(name='pp',pass_context = True)
-    async def help(ctx, *, arg):
+    @bot.command(name='pp')
+    async def help(ctx):
             await ctx.message.channel.send("Kettle-BOT Helped!")
 
 
@@ -222,10 +224,15 @@ class MyCog(commands.Cog):
     async def editmcstat(self):
         mc=mcstat()
         ebvar = discord.Embed(title=("Minecraft server Stats"), description="Running: "+ mc[3], color=0x16C500)
+        mplay =""
+        for each in mc[1].get("list"):
+            mplay+= str(each) + "\n"
+        mplay = mplay[:-1]
+
         ebvar.add_field(name="Online?", value=mc[0], inline=False)
         ebvar.add_field(name="IP:", value=mc[2], inline=False)
         ebvar.add_field(name="Players:", value=str(mc[1].get("online"))+" out of "+str(mc[1].get("max"))+ " online.", inline=False)
-
+        ebvar.add_field(name="List:", value=mplay, inline=False)
         msg=await bot.get_channel(760099567391342653).fetch_message(767124576542785556)
         await msg.edit(content = None, embed=ebvar)
 
@@ -236,4 +243,4 @@ class MyCog(commands.Cog):
 
 
 ####################################################################################
-bot.run(TOKEN, reconnect=True)
+bot.run(open("key.txt", "r").read(), reconnect=True)
