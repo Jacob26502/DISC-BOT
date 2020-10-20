@@ -136,6 +136,23 @@ class DiscordBot():
     async def help(ctx):
             await ctx.message.channel.send("Kettle-BOT Helped!")
 
+##############################################################
+
+    @bot.command(name="whistle")
+    async def whistle(ctx):
+        channel = ctx.voice.voice_channel
+        if(channel!=None):
+            vc = await bot.join_voice_channel(ctx.voice.voice_channel)
+            player = vc.create_ffmpeg_player('Kettle.mp3', after = lambda:print('done'))
+            player.start()
+            while not player.is_done():
+                await asyncio.sleep(1) #sleeps while playing
+            player.stop()
+            await vc.disconnect()
+        else:
+            await bot.say('User is not in a channel')
+
+
 
 #####################################################
     @bot.event
