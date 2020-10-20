@@ -138,16 +138,15 @@ class DiscordBot():
 
 ##############################################################
 
-    @bot.command(name="whistle")
+    @bot.command(name="whistle",pass_context = True)
     async def whistle(ctx):
-        channel = ctx.voice.voice_channel
+        channel = ctx.author.voice.channel
         if(channel!=None):
-            vc = await bot.join_voice_channel(ctx.voice.voice_channel)
-            player = vc.create_ffmpeg_player('Kettle.mp3', after = lambda:print('done'))
-            player.start()
-            while not player.is_done():
+            vc = await channel.connect()
+            vc.play(discord.FFmpegOpusAudio(executable="C:/DISC BOT/bin/ffmpeg.exe",source='Kettle.mp3'))
+            ##player.start()
+            while vc.is_playing():
                 await asyncio.sleep(1) #sleeps while playing
-            player.stop()
             await vc.disconnect()
         else:
             await bot.say('User is not in a channel')
@@ -242,8 +241,12 @@ class MyCog(commands.Cog):
         mc=mcstat()
         ebvar = discord.Embed(title=("Minecraft server Stats"), description="Running: "+ mc[3], color=0x16C500)
         mplay =""
-        for each in mc[1].get("list"):
-            mplay+= str(each) + "\n"
+        if mc[1].get("list")== None:
+            mplay="No Players"
+        else:
+            for each in mc[1].get("list"):
+                mplay+= str(each) + "\n"
+
         mplay = mplay[:-1]
 
         ebvar.add_field(name="Online?", value=mc[0], inline=False)
