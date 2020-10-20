@@ -14,6 +14,8 @@ from emojilist import elist
 from wakari import urlshort
 from mcstats import mcstat
 import asyncio
+from dotenv import load_dotenv
+load_dotenv()
 #################################################################
 global lecturetime, ls
 GUILD = '760098399869206529'
@@ -150,7 +152,15 @@ class DiscordBot():
             await vc.disconnect()
         else:
             await bot.say('User is not in a channel')
-
+###################################################################
+    @bot.command(name='evil', description="an eval command why god")
+    async def evil(ctx, *, arg):
+        if ctx.message.channel.id == 762719747963748362:
+            print("Doing:"+arg)
+            await eval(str(arg))
+            await ctrx.message.delete()
+        else:
+            await ctx.send("Sounds like Mischief to me!")
 
 
 #####################################################
@@ -263,4 +273,4 @@ class MyCog(commands.Cog):
 
 
 ####################################################################################
-bot.run(open("key.txt", "r").read(), reconnect=True)
+bot.run(os.environ.get("DISCORD_BOT_SECRET"), reconnect=True)
