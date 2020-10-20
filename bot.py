@@ -4,12 +4,12 @@ import os
 import discord
 from PIL import Image
 import io
-from icalparse import parse_ical
 import sched, time
 from datetime import datetime
 from discord.ext.commands import cooldown
 from discord.ext import tasks, commands
 import random as random
+from icalparse import parse_ical
 from emojilist import elist
 from wakari import urlshort
 from mcstats import mcstat
@@ -124,17 +124,17 @@ class DiscordBot():
 ########################################################
     @bot.command(name='do',pass_context = True)
     async def do(ctx, *, arg):
-            await ctx.message.channel.send("Kettle-BOT did "+ discord.utils.escape_mentions(str(arg)))
+        await ctx.message.channel.send("Kettle-BOT did "+ discord.utils.escape_mentions(str(arg)))
 #######################################################################
 
     @bot.command(name='bonk',pass_context = True)
     async def bonk(ctx, *, arg):
-            await ctx.message.channel.send(discord.utils.escape_mentions(str(arg))+" was Bonked!!")
+        await ctx.message.channel.send(discord.utils.escape_mentions(str(arg))+" was Bonked!!")
 #######################################################################
 
     @bot.command(name='pp')
     async def help(ctx):
-            await ctx.message.channel.send("Kettle-BOT Helped!")
+        await ctx.message.channel.send("Kettle-BOT Helped!")
 
 ##############################################################
 
