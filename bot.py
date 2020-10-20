@@ -1,6 +1,7 @@
 # bot.py
 #################################################################
 import os
+import sys
 import discord
 from PIL import Image
 import io
@@ -88,13 +89,13 @@ class DiscordBot():
         bot.add_cog(MyCog())
         print(bot.user)
 #####################################################
-    @bot.command(name='emlist')
+    @bot.command(name='emlist',brief="refreshes internal emojilist")
     async def emlist(ctx, *args):
         global ls
         ls=elist()
         print("emojilist reloaded")
 ######################################################
-    @bot.command(name='cumlord',pass_context = True)
+    @bot.command(name='cumlord',pass_context = True, brief="you can cum, i guess")
     async def cumlord(ctx):
         print("A coomer tried to Coom")
         c=False
@@ -111,36 +112,36 @@ class DiscordBot():
         c=False
 #####################################################
     @cooldown(1,600)
-    @bot.command(name='next5',pass_context = True)
+    @bot.command(name='next5',pass_context = True,brief="prints the next 5 lectures and times at UTC")
     async def next5(ctx):
         for x in richifier(parse_ical()):
             await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
 #################################################
 
-    @bot.command(name='flip',pass_context = True)
+    @bot.command(name='flip',pass_context = True,brief="flips a coin (is definitely tails biased)")
     async def flip(ctx):
         if random.randint(0,1) == 1:
             await ctx.message.channel.send("Heads")
         else:
             await ctx.message.channel.send("Tails")
 ########################################################
-    @bot.command(name='do',pass_context = True)
+    @bot.command(name='do',pass_context = True,brief="Kettle-BOT will do anything for your love")
     async def do(ctx, *, arg):
         await ctx.message.channel.send("Kettle-BOT did "+ discord.utils.escape_mentions(str(arg)))
 #######################################################################
 
-    @bot.command(name='bonk',pass_context = True)
+    @bot.command(name='bonk',pass_context = True,brief="Bonks someone")
     async def bonk(ctx, *, arg):
         await ctx.message.channel.send(discord.utils.escape_mentions(str(arg))+" was Bonked!!")
 #######################################################################
 
-    @bot.command(name='pp')
+    @bot.command(name='pp',brief="let it know that it helped")
     async def help(ctx):
         await ctx.message.channel.send("Kettle-BOT Helped!")
 
 ##############################################################
 
-    @bot.command(name="whistle",pass_context = True)
+    @bot.command(name="whistle",pass_context = True,brief="Whistles in your VC")
     async def whistle(ctx):
         channel = ctx.author.voice.channel
         if(channel!=None):
@@ -153,15 +154,22 @@ class DiscordBot():
         else:
             await bot.say('User is not in a channel')
 ###################################################################
-    @bot.command(name='evil', description="an eval command why god")
+    @bot.command(name='evil', brief="an eval command why god")
     async def evil(ctx, *, arg):
+
         if ctx.message.channel.id == 762719747963748362:
+            await ctx.message.delete()
             print("Doing:"+arg)
-            await eval(str(arg))
-            await ctrx.message.delete()
+            await eval(arg)
         else:
+            await ctx.message.delete()
             await ctx.send("Sounds like Mischief to me!")
 
+###################################################################
+
+
+
+###################################################################
 
 #####################################################
     @bot.event
