@@ -1,7 +1,6 @@
 # bot.py
 #################################################################
 import os
-import sys
 import discord
 from PIL import Image
 import io
@@ -89,13 +88,13 @@ class DiscordBot():
         bot.add_cog(MyCog())
         print(bot.user)
 #####################################################
-    @bot.command(name='emlist',brief="refreshes internal emojilist")
+    @bot.command(name='emlist')
     async def emlist(ctx, *args):
         global ls
         ls=elist()
         print("emojilist reloaded")
 ######################################################
-    @bot.command(name='cumlord',pass_context = True, brief="you can cum, i guess")
+    @bot.command(name='cumlord',pass_context = True)
     async def cumlord(ctx):
         print("A coomer tried to Coom")
         c=False
@@ -112,36 +111,36 @@ class DiscordBot():
         c=False
 #####################################################
     @cooldown(1,600)
-    @bot.command(name='next5',pass_context = True,brief="prints the next 5 lectures and times at UTC")
+    @bot.command(name='next5',pass_context = True)
     async def next5(ctx):
         for x in richifier(parse_ical()):
             await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
 #################################################
 
-    @bot.command(name='flip',pass_context = True,brief="flips a coin (is definitely tails biased)")
+    @bot.command(name='flip',pass_context = True)
     async def flip(ctx):
         if random.randint(0,1) == 1:
             await ctx.message.channel.send("Heads")
         else:
             await ctx.message.channel.send("Tails")
 ########################################################
-    @bot.command(name='do',pass_context = True,brief="Kettle-BOT will do anything for your love")
+    @bot.command(name='do',pass_context = True)
     async def do(ctx, *, arg):
         await ctx.message.channel.send("Kettle-BOT did "+ discord.utils.escape_mentions(str(arg)))
 #######################################################################
 
-    @bot.command(name='bonk',pass_context = True,brief="Bonks someone")
+    @bot.command(name='bonk',pass_context = True)
     async def bonk(ctx, *, arg):
         await ctx.message.channel.send(discord.utils.escape_mentions(str(arg))+" was Bonked!!")
 #######################################################################
 
-    @bot.command(name='pp',brief="let it know that it helped")
+    @bot.command(name='pp')
     async def help(ctx):
         await ctx.message.channel.send("Kettle-BOT Helped!")
 
 ##############################################################
 
-    @bot.command(name="whistle",pass_context = True,brief="Whistles in your VC")
+    @bot.command(name="whistle",pass_context = True)
     async def whistle(ctx):
         channel = ctx.author.voice.channel
         if(channel!=None):
@@ -154,29 +153,22 @@ class DiscordBot():
         else:
             await bot.say('User is not in a channel')
 ###################################################################
-    @bot.command(name='evil', brief="an eval command why god")
+    @bot.command(name='evil', description="an eval command why god")
     async def evil(ctx, *, arg):
-
         if ctx.message.channel.id == 762719747963748362:
-            await ctx.message.delete()
             print("Doing:"+arg)
-            await eval(arg)
+            await eval(str(arg))
+            await ctrx.message.delete()
         else:
-            await ctx.message.delete()
             await ctx.send("Sounds like Mischief to me!")
 
-###################################################################
-
-
-
-###################################################################
 
 #####################################################
     @bot.event
     async def on_message(message):
         if message.author == bot.user:
             return
-        elif random.randint(0,6900) == 42:
+        elif random.randint(0,690) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
         await bot.process_commands(message)
@@ -215,8 +207,8 @@ class MyCog(commands.Cog):
         global lecturetime
         embedVar = discord.Embed(title=("Lecture: "+ futurenow[2] + "  in "+str(round(((time.time()-futurenow[0])/60)))+ "mins"), description=futurenow[1], color=0x16C500)
         embedVar.add_field(name="Dear, ", value="""<@&764601237986738197>""", inline=False)
-        embedVar.add_field(name="Course Homepage", value="[HERE]"+"("+("https://waa.ai/"+urlshort(str(futurenow[4])))+")", inline=False)
-        embedVar.add_field(name="Online Lecture Location", value="[Click here to go to the Lecture (if available)]"+"("+("https://waa.ai/"+urlshort(str(futurenow[5])))+")", inline=False)
+        embedVar.add_field(name="Course Homepage", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[4]))+")", inline=False)
+        embedVar.add_field(name="Online Lecture Location", value="[Click here to go to the Lecture (if available)]"+"("+("https://waa.ai/"+urlshort(futurenow[5]))+")", inline=False)
         if futurenow[3]=="COMP1202":
             embedVar.set_thumbnail(url="https://i.imgur.com/eRgMUFx.png")
             embedVar.add_field(name="For more info please go to", value="""<#764590654448861185>""", inline=False)
@@ -254,24 +246,23 @@ class MyCog(commands.Cog):
             pass
 ###############################################################################################
 
-    @tasks.loop(seconds=10.0)
+    @tasks.loop(seconds=60.0)
     async def editmcstat(self):
         mc=mcstat()
         ebvar = discord.Embed(title=("Minecraft server Stats"), description="Running: "+ mc[3], color=0x16C500)
-
-
-        ebvar.add_field(name="Online?", value=mc[0], inline=False)
-        ebvar.add_field(name="IP:", value=mc[2], inline=False)
         mplay =""
         if mc[1].get("list")== None:
-            mplay="No Players_"
-            ebvar.add_field(name="Players:", value="0 out of "+str(mc[1].get("max"))+ " online.", inline=False)
+            mplay="No Players"
         else:
             for each in mc[1].get("list"):
                 mplay+= str(each) + "\n"
-            ebvar.add_field(name="Players:", value=str(mc[1].get("online"))+" out of "+str(mc[1].get("max"))+ " online.", inline=False)
-        ebvar.add_field(name="List:", value=mplay[:-1], inline=False)
-        ebvar.add_field(name="Last Updated", value = datetime.now().strftime("%H:%M:%S"), inline=False)
+
+        mplay = mplay[:-1]
+
+        ebvar.add_field(name="Online?", value=mc[0], inline=False)
+        ebvar.add_field(name="IP:", value=mc[2], inline=False)
+        ebvar.add_field(name="Players:", value=str(mc[1].get("online"))+" out of "+str(mc[1].get("max"))+ " online.", inline=False)
+        ebvar.add_field(name="List:", value=mplay, inline=False)
         msg=await bot.get_channel(760099567391342653).fetch_message(767124576542785556)
         await msg.edit(content = None, embed=ebvar)
 

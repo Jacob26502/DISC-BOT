@@ -1,12 +1,6 @@
 import os
 import discord
-from PIL import Image
-import io
-import sched, time
-from datetime import datetime
-from discord.ext.commands import cooldown
-from discord.ext import tasks, commands
-import random as random
+from discord.ext import commands
 import asyncio
 from dotenv import load_dotenv
 load_dotenv()
@@ -16,10 +10,13 @@ class DiscordBot():
     @bot.event
     async def on_ready():
         print(bot.user)
-    @bot.command(name='args')
-    async def emlist(ctx, *, arg):
-        print("Doing:"+str(arg))
-        eval(str(arg))
+    @bot.command(name='evil', description="an eval command why god")
+    async def evil(ctx, *, arg):
+        if ctx.message.channel.id == 762719747963748362:
+            print("Doing:"+arg)
+            await eval(str(arg))
+            await ctrx.message.delete()
+        else:
+            await ctx.send("Sounds like Mischief to me!")
 
-
-bot.run(os.environ.get('KEY'), reconnect=True)
+bot.run(os.environ.get("DISCORD_BOT_SECRET"), reconnect=True)
