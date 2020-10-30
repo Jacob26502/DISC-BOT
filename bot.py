@@ -39,6 +39,19 @@ lecturetime=False
 global future6
 #################################################################
 
+
+def reactionno(list):
+    for x in list:
+        if x.emoji.id==764307177888284723:
+            return x.count
+
+
+
+
+
+
+
+#############################################################
 print(time.time())
 scheduler = sched.scheduler(time.time, time.sleep)
 ##################################################################
@@ -89,6 +102,74 @@ class DiscordBot():
         bot.add_cog(MyCog())
         print(bot.user)
 #####################################################
+    @bot.event
+    async def on_message_delete(msgctx):
+        if msgctx.author.bot == False:
+            #print(msgctx.author.bot)
+            #print(msgctx.author.id)
+            await bot.get_channel(769348852591231027).send("```User "+msgctx.author.name+" deleted message:\n" + msgctx.content + "\n from channel: " + msgctx.channel.name + "\n at time: " + datetime.today().ctime()+"```")
+##############################################
+
+
+#
+    # @cooldown(1,600)
+    # @bot.event
+    # async def on_typing(channel,user,when):
+        # if user.id == 139113990537216000:
+            # await channel.send("Warning, Avery am about to type!")
+
+
+
+####################################################################
+    @bot.event
+    async def on_message_edit(before,after):
+        if before.author.bot == False:
+            await bot.get_channel(769348852591231027).send("```User "+before.author.name+" edited message in:\n"+before.channel.name +"\nFrom:\n" +before.content +"\nTo: \n" +after.content+"\n at time: "+datetime.today().ctime()+"```")
+
+##############################################################
+    @bot.command(name="jail",pass_context=True,brief="sends people to hell")
+    async def jail(ctx,user: discord.Member):
+        if ctx.author.guild_permissions.administrator==True:
+            await user.add_roles(bot.get_guild(int(GUILD)).get_role(768969185467564033))
+            await ctx.message.channel.send(user.name + " has been sent to Horny Jail™")
+        else:
+            print("Someone tried to jail")
+    @bot.command(name="unjail",pass_context=True,brief="releases people from Hell")
+    async def jail(ctx,user: discord.Member):
+        if ctx.author.guild_permissions.administrator==True:
+            await user.remove_roles(bot.get_guild(int(GUILD)).get_role(768969185467564033))
+            await ctx.message.channel.send(user.name + " has been released from Horny Jail™")
+        else:
+            print("Someone tried to unjail")
+###########################################################
+    @cooldown(1,60)
+    @bot.command(name="votejail",pass_context=True,brief="Communism in action")
+    async def votejail(ctx,user: discord.Member):
+        test01 = await ctx.message.channel.send("User: "+ctx.message.author.name+"\nHas tried to Jail:"+user.name+"\nRemaining Votes Needed:8\nTime Left:300s")
+        await test01.add_reaction(bot.get_emoji(764307177888284723))
+        id=test01.id
+        count=300
+        while count != -1:
+            test01=await bot.get_channel(ctx.message.channel.id).fetch_message(id)
+            rno=int(reactionno(test01.reactions))-1
+            count -=1
+            await asyncio.sleep(1)
+            await test01.edit(content=("User: "+ctx.message.author.name+"\nHas tried to Jail:"+user.name+"\nRemaining Votes Needed:"+str(8-rno) +"\nTime Left:"+str(count)+"s"))
+            print(rno)
+            if rno>=8:
+                await user.add_roles(bot.get_guild(int(GUILD)).get_role(768969185467564033))
+                break
+        if count ==0:
+            return
+        countdown=300
+        while countdown != -1:
+            await test01.edit(content=("User: "+ctx.message.author.name+"\nHas Successfully Jailed:"+user.name+"\nTime Left:"+str(countdown)+"s"))
+            countdown -=1
+            await asyncio.sleep(1)
+            if countdown==0:
+                await user.remove_roles(bot.get_guild(int(GUILD)).get_role(768969185467564033))
+                return
+######################################################
     @bot.command(name='emlist',brief="refreshes internal emojilist")
     async def emlist(ctx, *args):
         global ls
@@ -127,12 +208,12 @@ class DiscordBot():
 ########################################################
     @bot.command(name='do',pass_context = True,brief="Kettle-BOT will do anything for your love")
     async def do(ctx, *, arg):
-        await ctx.message.channel.send("Kettle-BOT did "+ discord.utils.escape_mentions(str(arg)))
+        await ctx.message.channel.send("Kettle-BOT did "+ (ctx.message.clean_content)[4::])
 #######################################################################
 
     @bot.command(name='bonk',pass_context = True,brief="Bonks someone")
-    async def bonk(ctx, *, arg):
-        await ctx.message.channel.send(discord.utils.escape_mentions(str(arg))+" was Bonked!!")
+    async def bonk(ctx, user: discord.Member):
+        await ctx.message.channel.send(user.name+" was Bonked!!")
 #######################################################################
 
     @bot.command(name='pp',brief="let it know that it helped")
