@@ -24,6 +24,7 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='|',intents=intents)
 ls=elist()
 c=False
+global clok
 #################################################################
 urlfile=open("urlkey.csv", mode="r").read().split("\n")
 urlkey=[]
@@ -44,8 +45,6 @@ def reactionno(list):
     for x in list:
         if x.emoji.id==764307177888284723:
             return x.count
-
-
 
 
 
@@ -97,6 +96,7 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
 
 ###################################################################
 class DiscordBot():
+    global clok
     @bot.event
     async def on_ready():
         bot.add_cog(MyCog())
@@ -233,8 +233,35 @@ class DiscordBot():
                 await asyncio.sleep(1) #sleeps while playing
             await vc.disconnect()
         else:
-            await bot.say('User is not in a channel')
+            await ctx.send('User is not in a channel')
 ###################################################################
+
+
+    @bot.command(name="degen",pass_context = True,brief="Degens in your VC")
+    async def degen(ctx):
+        global vc
+        vcchannel = ctx.author.voice.channel
+        if(vcchannel!=None):
+            vc = await vcchannel.connect(timeout = 10.0)
+            vc.play(discord.FFmpegPCMAudio(executable="C:/DISC BOT/bin/ffmpeg.exe",source='https://listen.moe/stream',before_options="-stream_loop -1"))
+            ##player.start()
+            while vc.is_playing():
+                await asyncio.sleep(5)
+                #sleeps while playing
+            await vc.disconnect()
+        else:
+            await ctx.send('User is not in a channel')
+###################################################################
+
+    @bot.command(name="leave",pass_context = True,brief="leaves")
+    async def leave(ctx):
+        global vc
+        global vcchannel
+        await vc.disconnect()
+
+
+
+######################################################################
     @bot.command(name='evil', brief="an eval command why god")
     async def evil(ctx, *, arg):
 
@@ -255,6 +282,7 @@ class DiscordBot():
 #####################################################
     @bot.event
     async def on_message(message):
+        #print(clok)
         if message.author == bot.user:
             return
         elif random.randint(0,6900) == 42:
@@ -284,12 +312,16 @@ class DiscordBot():
 
 class MyCog(commands.Cog):
     def __init__(self):
+        global clok
         self.index = 0
         self.timecheck.start()
         self.editmcstat.start()
+        self.clock.start()
 #########################################################################################
     def cog_unload(self):
         self.timecheck.cancel()
+        self.editmcstat.cancel()
+        self.clock.cancel()
 ##########################################################################################
     @tasks.loop(count=None)
     async def createmsg(self,futurenow):
@@ -356,7 +388,10 @@ class MyCog(commands.Cog):
         msg=await bot.get_channel(760099567391342653).fetch_message(767124576542785556)
         await msg.edit(content = None, embed=ebvar)
 
-
+    @tasks.loop(seconds=1.0)
+    async def clock(self):
+        global clok
+        clok = int(round(time.time()))
 
 
 
