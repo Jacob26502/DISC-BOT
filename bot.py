@@ -142,7 +142,7 @@ class DiscordBot():
         else:
             print("Someone tried to unjail")
 ###########################################################
-    @cooldown(1,60)
+    @cooldown(1,120)
     @bot.command(name="votejail",pass_context=True,brief="Communism in action")
     async def votejail(ctx,user: discord.Member):
         test01 = await ctx.message.channel.send("User: "+ctx.message.author.name+"\nHas tried to Jail:"+user.name+"\nRemaining Votes Needed:8\nTime Left:300s")
@@ -169,6 +169,11 @@ class DiscordBot():
             if countdown==0:
                 await user.remove_roles(bot.get_guild(int(GUILD)).get_role(768969185467564033))
                 return
+
+    @votejail.error
+    async def votejail_error(ctx,error):
+        if isinstance(error,commands.CommandOnCooldown):
+            await ctx.send("Tis on cooldown, please wait "+str(error.retry_after))
 ######################################################
     @bot.command(name='emlist',brief="refreshes internal emojilist")
     async def emlist(ctx, *args):
@@ -192,11 +197,27 @@ class DiscordBot():
             await ctx.message.channel.send(ctx.message.author.name + " has Coomed")
         c=False
 #####################################################
-    @cooldown(1,600)
-    @bot.command(name='next5',pass_context = True,brief="prints the next 5 lectures and times at UTC")
-    async def next5(ctx):
-        for x in richifier(parse_ical()):
-            await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
+    @cooldown(1,30)
+    @bot.command(name='next',pass_context = True,brief="prints the next lectures and times (up to 5)")
+    async def next(ctx, *args):
+        if not args:
+            no=0
+        elif args[0].isdigit() != True:
+            return
+        else:
+            no=int(args[0])-1
+            if no >=5:
+                no = 4
+            elif no<0:
+                no = 0
+
+        for count,x in enumerate(richifier(parse_ical())):
+            if count > no:
+                continue
+            else:
+                await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
+
+
 #################################################
 
     @bot.command(name='flip',pass_context = True,brief="flips a coin (is definitely tails biased)")
