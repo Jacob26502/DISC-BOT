@@ -7,3 +7,5 @@ wakari.py
 wakari.py
 TESTLECTURE.csv
 *.env
+db.json
+levelparams.py
