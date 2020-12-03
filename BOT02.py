@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 from tinydb import TinyDB, Query, where
 import json
 import re
+import math
+import typing
 from tinydb.operations import delete, increment, decrement, set
 load_dotenv()
 #################################################################
@@ -53,22 +55,13 @@ person = Query()
 ##DATABASE
 ## first is user ID, then count, then horny count, then last message time(lmsg)
 ####################################################################
-def sortfunc1(e):                    ## 1 for messages, 2 for horny
-        return int(e.get('msgcount'))
-def sortfunc2(e):
-        return e.get("hornycount")
 
-
-####################################################################
 def reactionno(list):
     for x in list:
         if x.emoji.id==764307177888284723:
             return x.count
 ###############################################################
 
-
-
-#############################################################
 print(time.time())
 scheduler = sched.scheduler(time.time, time.sleep)
 ##################################################################
@@ -79,7 +72,7 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
             if x[0]==each[3]:
                 future6[count].append(x[1])
         if each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Friday":    ##adds context to each lecture
-            future6[count][1]="Space Cadets"
+            future6[count][1]="Space Cadets, optional"
             future6[count].append("https://teams.microsoft.com/l/channel/19%3aa96eb5721aef41099e19690b93c27ab7%40thread.tacv2/Space%2520Cadets%2520(Fri%252016-18)?groupId=143e2cc4-76a6-42e4-95d9-a25c1afd59f6&tenantId=4a5378f9-29f4-4d3e-be89-669d03ada9d8")                                                    ##ALSO adds the link to slot [5]
         elif each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
             future6[count][1]="FAQ Session"
@@ -100,16 +93,12 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
             future6[count][1]="Q&A session/summarise the week's lectures"
             future6[count].append("https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_191256_1&mode=cpview")
         elif each[3]=="COMP1203" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
-            future6[count][1]="To help with our RasPi coursework (doesn't exist yet so no URL)"
+            future6[count][1]="To help with our RasPi coursework (ON THE BLACKBOARD)(STARTS AT 10AM not 9AM)(DONT CLICK THE LINK)"
             future6[count].append("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         else:
             continue
     return future6
 ###################################################################
-
-
-
-
 
 
 ###################################################################
@@ -118,8 +107,8 @@ class DiscordBot():
     @bot.event
     async def on_ready():
         bot.add_cog(MyCog())
-        bot.add_cog(JAILSTUFF(bot))
-        await bot.change_presence(status=discord.Status.dnd)    ##TODO: REMOVE this when going back online ##################
+        #bot.add_cog(JAILSTUFF(bot))
+        await bot.change_presence(status=discord.Status.online)    ##TODO: REMOVE this when going back online ##################
         print(bot.user)
 
 #####################################################
@@ -127,12 +116,11 @@ class DiscordBot():
     async def on_message(message):
         #print(clok)
         ##return  ##TODO: REMOVE this when going back online #####################################################################################
-        if message.author == bot.user:
+        if message.author == bot.user or message.channel.id == 769348852591231027:
             return
         elif random.randint(0,6900) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
-
 
         if (db.contains(person.id==str(message.author.id))):
             if (db.get(person.id==str(message.author.id)).get('lmsg')-round(time.time())<= -3):
@@ -140,7 +128,7 @@ class DiscordBot():
                 db.update(increment('msgcount'), person.id==str(message.author.id))
                 db.update(set('lmsg',round(time.time())),person.id==str(message.author.id))
 
-        else:
+        elif not (db.contains(person.id==str(message.author.id))):
             db.insert({'id': str(message.author.id), 'msgcount': 0, 'hornycount':0, 'lmsg':0})
             ##print("nay")
         if  "||" not in message.clean_content:
@@ -156,42 +144,42 @@ class DiscordBot():
             ##embed1.timestamp(str((message.created_at).strftime('%Y-%m-%d %H:%M:%S')))
             await message.channel.send(embed=embed1)
 
+####################################################################
 
+    @bot.event
+    async def on_member_remove(member):
+        await bot.get_channel(769348852591231027).send("```User "+member.name+"/"+member.display_name +" Left at time: "+datetime.today().ctime()+"```")
 
-        #####################################################
+    @bot.event
+    async def on_member_join(member):
+        await bot.get_channel(769348852591231027).send("```User "+member.name+" Joined at time: "+datetime.today().ctime()+"```")
+
+#####################################################
     @bot.event
     async def on_message_delete(msgctx):
         if msgctx.author.bot == False:
-            #print(msgctx.author.bot)
-            #print(msgctx.author.id)
-            await bot.get_channel(769348852591231027).send("```User "+msgctx.author.name+" deleted message:\n" + msgctx.content + "\n from channel: " + msgctx.channel.name + "\n at time: " + datetime.today().ctime()+"```")
-##############################################
-
-
-#
-    # @cooldown(1,600)
-    # @bot.event
-    # async def on_typing(channel,user,when):
-        # if user.id == 139113990537216000:
-            # await channel.send("Warning, Avery am about to type!")
-
-
-
+            flist=[]
+            for x in msgctx.attachments:
+                flist.append(await x.to_file())
+            await bot.get_channel(769348852591231027).send("```User "+msgctx.author.name+" deleted message:\n" + msgctx.content + "\n from channel: " + msgctx.channel.name + "\n at time: " + datetime.today().ctime()+"```\nIncluding Files:", files=flist)
 ####################################################################
     @bot.event
     async def on_message_edit(before,after):
         if before.author.bot == False:
-            await bot.get_channel(769348852591231027).send("```User "+before.author.name+" edited message in:\n"+before.channel.name +"\nFrom:\n" +before.content +"\nTo: \n" +after.content+"\n at time: "+datetime.today().ctime()+"```")
+            flist=[]
+            for x in before.attachments:
+                flist.append(await x.to_file())
+            await bot.get_channel(769348852591231027).send("```User "+before.author.name+" edited message in:\n"+before.channel.name +"\nFrom:\n" +before.content +"\nTo: \n" +after.content+"\n at time: "+datetime.today().ctime()+"```\nIncluding Files:", files=flist)
 
 ##############################################################
-    @bot.command(name="jail",pass_context=True,brief="sends people to hell")
+    @bot.command(name="jail",pass_context=True,brief="(ADMIN) sends people to hell")
     async def jail(ctx,user: discord.Member):
         if ctx.author.guild_permissions.administrator==True:
             await user.add_roles(bot.get_guild(guildID).get_role(768969185467564033))
             await ctx.message.channel.send(user.name + " has been sent to Horny Jail™")
         else:
             print("Someone tried to jail")
-    @bot.command(name="unjail",pass_context=True,brief="releases people from Hell")
+    @bot.command(name="unjail",pass_context=True,brief="(ADMIN) releases people from Hell")
     async def jail(ctx,user: discord.Member):
         if ctx.author.guild_permissions.administrator==True:
             await user.remove_roles(bot.get_guild(guildID).get_role(768969185467564033))
@@ -199,21 +187,21 @@ class DiscordBot():
         else:
             print("Someone tried to unjail")
 ###############################################################################################################################################################################
-    @cooldown(1,120)
-    @bot.command(name="votejail",pass_context=True,brief="Communism in Action")
-    async def votejail(ctx,user: discord.Member):
+    ##@cooldown(1,120)
+    ##@bot.command(name="votejail",pass_context=True,brief="Communism in Action")
+    async def votejail(ctx,user: discord.Member):   #TODO: make it work again
         test01 = await ctx.message.channel.send("User: "+ctx.message.author.name+"\nHas tried to Jail:"+user.name+"\nRemaining Votes Needed:8\nTime Left:300s")
         await test01.add_reaction(bot.get_emoji(764307177888284723))
         await asyncio.sleep(1)
         await JAILSTUFF.vjail.start(ctx,user)
 #################################################################################################################################################################################
-    @bot.command(name='emlist',brief="refreshes internal emojilist")
+    @bot.command(name='emlist',brief="Admin only")
     async def emlist(ctx, *args):
         global ls
         ls=elist()
         print("emojilist reloaded")
 ######################################################
-    @bot.command(name='cumlord',pass_context = True, brief="you can cum, I guess")
+    @bot.command(name='cumlord',pass_context = True, brief="A fan request, don't ask",aliases=['coom'])
     async def cumlord(ctx):
         print("A coomer tried to Coom")
         c=False
@@ -244,19 +232,26 @@ class DiscordBot():
                 no = 4
             elif no<0:
                 no = 0
-
+        string10=""
         for count,x in enumerate(richifier(parse_ical())):
             if count > no:
                 continue
             else:
-                await ctx.message.channel.send("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S')+"\nLecture: "+str(x[2]))
-
+                string10=(string10+("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%H:%M %d-%m-%Y')+"\nLecture: "+str(x[2]))+"\n")
+        await ctx.message.channel.send(string10)
+    @next.error
+    async def next_error(ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = 'This command is ratelimited, please try again in {:.2f}s'.format(error.retry_after)
+            await ctx.send(msg)
+        else:
+            raise error
 
 #################################################
 
     @bot.command(name='flip',pass_context = True,brief="flips a coin (is definitely tails biased)")
     async def flip(ctx):
-        if random.randint(0,1) == 1:
+        if random.randint(0,99) < 48 :
             await ctx.message.channel.send("Heads")
         else:
             await ctx.message.channel.send("Tails")
@@ -266,9 +261,9 @@ class DiscordBot():
         await ctx.message.channel.send("Kettle-BOT did "+ (ctx.message.clean_content)[4::])
 #######################################################################
 
-    @bot.command(name='bonk',pass_context = True,brief="Bonks someone")
+    @bot.command(name='bonk',pass_context = True,brief="Bonks someone(a mention)")
     async def bonk(ctx, user: discord.Member):
-        await ctx.message.channel.send(user.display_name+" was Bonked!!")
+        await ctx.message.channel.send(user.display_name.replace("@","")+" was Bonked!!")
 #######################################################################
 
     @bot.command(name='pp',brief="let it know that it helped")
@@ -277,12 +272,13 @@ class DiscordBot():
 
 ##############################################################
 
-    @bot.command(name="whistle",pass_context = True,brief="Whistles in your VC")
+    @bot.command(name="whistle",pass_context = True,brief="Whistles in your VC, really annoying")
     async def whistle(ctx):
+        global vc
         channel = ctx.author.voice.channel
         if(channel!=None):
             vc = await channel.connect()
-            vc.play(discord.FFmpegOpusAudio(executable="C:/DISC BOT/bin/ffmpeg.exe",source='Kettle.mp3'))
+            vc.play(discord.FFmpegOpusAudio(source='Kettle.mp3',options='-filter:a "volume=0.1"'))
             ##player.start()
             while vc.is_playing():
                 await asyncio.sleep(1) #sleeps while playing
@@ -292,13 +288,13 @@ class DiscordBot():
 ###################################################################
 
 
-    @bot.command(name="degen",pass_context = True,brief="Degens in your VC")
+    @bot.command(name="degen",pass_context = True,brief="Plays a J-pop radio station non-stop")
     async def degen(ctx):
         global vc
         vcchannel = ctx.author.voice.channel
         if(vcchannel!=None):
             vc = await vcchannel.connect(timeout = 10.0)
-            vc.play(discord.FFmpegPCMAudio(executable="C:/DISC BOT/bin/ffmpeg.exe",source='https://listen.moe/stream',before_options="-stream_loop -1"))
+            vc.play(discord.FFmpegPCMAudio(source='https://listen.moe/stream',before_options="-stream_loop -1",options='-filter:a "volume=0.2"'))
             ##player.start()
             while vc.is_playing():
                 await asyncio.sleep(5)
@@ -313,17 +309,6 @@ class DiscordBot():
         global vc
         await vc.disconnect()
 
-######################################################################
-    @bot.command(name='evil', brief="an eval command why god")
-    async def evil(ctx, *, arg):
-
-        if ctx.message.channel.id == 762719747963748362:
-            await ctx.message.delete()
-            print("Doing:"+arg)
-            await eval(arg)
-        else:
-            await ctx.message.delete()
-            await ctx.send("Sounds like Mischief to me!")
 
 ###################################################################
 
@@ -332,10 +317,10 @@ class DiscordBot():
     async def on_raw_reaction_add(payload):
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         if str(payload.emoji.id) == '764307177888284723':
-            if (db.contains(person.id==msg.author.id)):
+            if (db.contains(person.id==str(msg.author.id))):
                         ##print("yay")
                     db.update(increment('hornycount'), person.id==str(msg.author.id))
-            else:
+            elif not (db.contains(person.id==str(msg.author.id))):
                 db.insert({'id': str(msg.author.id), 'msgcount': 0, 'hornycount':0, 'lmsg':0})
         global ls
         for each in ls:
@@ -347,23 +332,29 @@ class DiscordBot():
     @bot.event
     async def on_raw_reaction_remove(payload):
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-        if payload.user_id==msg.author.id:
-            return
-        if str(payload.emoji.id) == '764307177888284723':
-            if (db.contains(person.id==str(msg.author.id))):
-                        ##print("yay")
-                    db.update(decrement('hornycount'), person.id==str(msg.author.id))
-            else:
-                db.insert({'id': str(msg.author.id), 'msgcount': 0, 'hornycount':0, 'lmsg':0})
+
         global ls
         for each in ls:
             if str(payload.message_id) == each[1]:
                 if str(payload.emoji.id) == each[0] or str(payload.emoji.name)==each[0]:
                     await bot.get_guild(guildID).get_member(payload.user_id).remove_roles(bot.get_guild(guildID).get_role(int(each[2])))
                     print(bot.get_guild(guildID).get_member(payload.user_id).name + " " + each[4])
+
+
+        if payload.user_id==msg.author.id:  ##if it's your message, don't add to leaderboard
+            return
+
+
+        if str(payload.emoji.id) == '764307177888284723':
+            if (db.contains(person.id==str(msg.author.id))):
+                        ##print("yay")
+                    db.update(decrement('hornycount'), person.id==str(msg.author.id))
+            elif not (db.contains(person.id==str(msg.author.id))):
+                db.insert({'id': str(msg.author.id), 'msgcount': 0, 'hornycount':0, 'lmsg':0})
+
 #####################################################################################
     @cooldown(1,120)
-    @bot.command(name='leaderboard', brief = 'prints top 10 leaderbaords')
+    @bot.command(name='leaderboard', brief = 'prints top 10 leaderbaords', aliases=['lboard'])
     async def leaderboard(ctx, *args):
         msg="```"
         lst1=[]
@@ -376,7 +367,7 @@ class DiscordBot():
                 continue
             if count == 11:
                 break
-            nick = str(bot.get_guild(guildID).get_member(int(x['id'])).display_name)
+            nick = str(bot.get_guild(guildID).get_member(int(x['id'])).display_name.replace("@","").replace("`","'"))
             ##dlam=int((len(nick)/2))
             #if count == 10:
             #    dlam-=1
@@ -384,24 +375,34 @@ class DiscordBot():
             msg = str(msg) + str(("\n"+str(count)+". "+nick))
         msg = msg + "```"
         await ctx.message.channel.send(msg)
+
+
+
+    @leaderboard.error
+    async def leaderboard_error(ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = 'This command is ratelimited, please try again in {:.2f}s'.format(error.retry_after)
+            await ctx.send(msg)
+        else:
+            raise error
 ######################################################################################################################################################
     @cooldown(1,120)
-    @bot.command(name='hornyboard', brief = 'prints top 10 hornies')
-    async def leaderboard(ctx, *args):
+    @bot.command(name='hornyboard', brief = 'prints top 10 hornies', aliases=['hboard'])
+    async def hornyboard(ctx, *args):
         msg="```"
         lst1=[]
         ##print(db.all())
-        print("leaderboard")
+        print("hornyboard")
         list=db.all()
         slist = sorted(list,key=lambda x:x.get('hornycount'),reverse=True)
         count101=0
         for x in slist:
             if x['id']=='267571848760393728' or x['id']=='762764960845004851':
                 continue
-            if count == 11:
+            if count101 == 10:
                 break
             count101+=1
-            nick = str(bot.get_guild(guildID).get_member(int(x['id'])).display_name)
+            nick = str(bot.get_guild(guildID).get_member(int(x['id'])).display_name.replace("@","").replace("`","'"))
             ##dlam=int((len(nick)/2))
             #if count == 10:
             #    dlam-=1
@@ -409,44 +410,108 @@ class DiscordBot():
             msg = str(msg) + str(("\n"+str(count101)+". "+nick))
         msg = msg + "```"
         await ctx.message.channel.send(msg)
+
+
+
+    @hornyboard.error
+    async def hornyboard_error(ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = 'This command is ratelimited, please try again in {:.2f}s'.format(error.retry_after)
+            await ctx.send(msg)
+        else:
+            raise error
 #######################################################################################################################################################
-    @bot.command(name='bidenmode', brief = 'bidenmode')
+    @bot.command(name='nekomode', brief = 'unleashes neko hell on earth', aliases=['bidenmode'])
     async def nekomode(ctx, *args):
-        if ctx.message.author.guild_permissions.administrator == True:
+        if ctx.message.author.guild_permissions.administrator==True:
             global nekomode
             nekomode = not nekomode
             print("nekomode HAS BEEN TOGGLED")
 
 #####################################################################################
-    @bot.command(name='shuffle', brief = 'shuffle')
+    @bot.command(name = 'shuffle', brief = 'shuffles text on spaces')
     async def shuffle(ctx, *args):
 
-        str01=args
-        str02=random.sample(str01,len(str01))
-        msg=""
-        if "@" in args:
-            await ctx.message.channel.send("thank <@!333335442747424799> for this one")
-            return
+        str01 = args
+        str02 = random.sample(str01, len(str01))
+        msg = ""
+        for x in args:
+            if "@" in list(x):
+                await ctx.message.channel.send("thank <@!333335442747424799> & <@!112831555310772224> for this one")
+                return
         for x in str02:
             msg = (msg + " " + x)
         await ctx.message.channel.send(msg)
+########################################################################################
+    @bot.command(name='id', brief = 'id get')
+    async def id(ctx, *, arg):
+        await ctx.message.channel.send(bot.get_guild(guildID).get_member(int(arg)).display_name)
+######################################################################################
+    @bot.command(name='depression',pass_context=True, brief = 'tells you percentage of messages compared to server total', aliases=['sad'], usage = "Input a mention, an ID or 'self'")
+    async def depression(ctx, user: typing.Optional[discord.Member] = None, *args):
+        try:
+            if args[0] == "self":
+                user = ctx.message.author
+            elif user == None:
+                try:
+                    user = bot.get_guild(guildID).get_member(int(args))
+                except (ValueError, TypeError):
+                    await ctx.message.channel.send("Not an ID, please try again")
+                    return
+        except:
+            pass
+
+        count=0
+        me=0
+        for x in db.all():
+            if int(x['id']) == user.id:
+                me = int(x['msgcount'])
+            count+= int(x['msgcount'])
+
+        perc= round((me)/(count/100),2)
+        await ctx.message.channel.send("Depression count: " + str(perc) + "%")
 
 
+    #####################################################################################
+    @bot.command(name='leadercompare',pass_context=True, brief = 'tells you percentage of messages compared to leader', aliases=['lcomp'], usage = "Input a mention, an ID or 'self'")
+    async def depression(ctx, user: typing.Optional[discord.Member] = None, *args):
+        try:
+            if args[0] == "self":
+                user = ctx.message.author
+            elif user == None:
+                try:
+                    user = bot.get_guild(guildID).get_member(int(args))
+                except (ValueError, TypeError):
+                    await ctx.message.channel.send("Not an ID, please try again")
+                    return
+        except:
+            pass
+
+        count=0
+        me=0
+        for x in db.all():
+            if int(x['id']) == user.id:
+                me = int(x['msgcount'])
+            if int(x['id']) == 267571848760393728:
+                count = int(x['msgcount'])
+
+        perc= round((me)/(count/100),2)
+        await ctx.message.channel.send("Depression count: " + str(perc) + "%")
 
 #####################################################################################
-    @bot.command(name='leveller', brief = 'admin only')
-    async def leveller(ctx):
+    @bot.command(name='level', brief = 'ADMIN, updates all user levels', aliases=['leveller'])
+    async def level(ctx):
 
         if ctx.author.guild_permissions.administrator != True:
             return
         slist = sorted(db.all(),key=lambda x:x.get('msgcount'),reverse=True)
         for x in slist:
-            if int(x['id'])==267571848760393728:
+            if int(x['id'])==267571848760393728 or int(x['id'])==235088799074484224:
                 continue
             if int(x['id']) < 100:
                 break
 
-            asyncio.sleep(1)
+            await asyncio.sleep(0.2)
             print("levelling: " + x['id'])
             ulevel=0
             member00=bot.get_guild(guildID).get_member(int(x['id']))
@@ -454,6 +519,7 @@ class DiscordBot():
             currentlv=0
             ids = []
             if member00 is None:
+                db.remove(person.id == x['id'])
                 continue
             for each in member00.roles:
                 ids.append(each.id)
@@ -475,18 +541,23 @@ class DiscordBot():
                 continue
             elif memberlv == 1:
                 await member00.add_roles(bot.get_guild(guildID).get_role(776845468126019594))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
             elif memberlv == 2:
                 await member00.remove_roles(bot.get_guild(guildID).get_role(776845468126019594))
                 await member00.add_roles(bot.get_guild(guildID).get_role(776856319261016074))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
             elif memberlv == 3:
                 await member00.remove_roles(bot.get_guild(guildID).get_role(776856319261016074))
                 await member00.add_roles(bot.get_guild(guildID).get_role(776856505269092403))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
             elif memberlv == 4:
                 await member00.remove_roles(bot.get_guild(guildID).get_role(776856505269092403))
                 await member00.add_roles(bot.get_guild(guildID).get_role(776856581551292448))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
             elif memberlv == 5:
                 await member00.remove_roles(bot.get_guild(guildID).get_role(776856581551292448))
                 await member00.add_roles(bot.get_guild(guildID).get_role(776856620981944331))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
             else:
                 print("Go cry to mommy")
 #####################################################################################
