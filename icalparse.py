@@ -3,7 +3,6 @@ from dateutil import parser as parser
 import datetime
 import time
 global time001
-global toby
 global ical03
 time001=int(time.time())
 global future
@@ -18,10 +17,8 @@ def sortbystring(ls):
 
 def parse_ical():
     global time001
-    global toby
     global ical03
     time001=int(time.time())
-    toby=100000000000
     ical00 = open("ical01.ics").read().split("\n")
     del ical00[0:6]
     ical01=[]
@@ -32,8 +29,7 @@ def parse_ical():
             continue
         else:
             ical01.append(x0)
-    #print("ical01")
-    #print(ical01)
+
     for v0,y in enumerate(ical01):
 
         if search("DTSTART",y):
@@ -41,16 +37,13 @@ def parse_ical():
             ical02[-1]=ical02[-1].split("|")
         else:
             continue
-    #print("ical02")
-    #print(ical02)
-    for v1,z in enumerate(ical02):
+
+    for z in ical02:    #TODO NEED TO CHANGE NEXT TERM
         if ((z[1] != "LOCATION:Online Delivery") or (search("Weekly Tutorial",z[2])!=None) or (search("ELEC",z[2])!=None)):
-            ##del(ical02[v1])
             continue
         else:
             ical03.append(z)
-    #print("ical03")
-    #print(ical03)
+
     for v2,x1 in enumerate(ical03):
         for v3,y in enumerate(x1):
             ical03[v2][v3]=y[y.find(":")+1:]
