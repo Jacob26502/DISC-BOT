@@ -9,3 +9,5 @@ TESTLECTURE.csv
 *.env
 db.json
 levelparams.py
+db1.json
+*.ical
