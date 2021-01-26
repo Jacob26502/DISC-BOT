@@ -107,7 +107,6 @@ class DiscordBot():
     @bot.event
     async def on_ready():
         bot.add_cog(MyCog())
-        #bot.add_cog(JAILSTUFF(bot))
         await bot.change_presence(status=discord.Status.online)    ##TODO: REMOVE this when going back online ##################
         print(bot.user)
 
@@ -172,52 +171,18 @@ class DiscordBot():
             await bot.get_channel(769348852591231027).send("```User "+before.author.name+" edited message in:\n"+before.channel.name +"\nFrom:\n" +before.content +"\nTo: \n" +after.content+"\n at time: "+datetime.today().ctime()+"```\nIncluding Files:", files=flist)
 
 ##############################################################
-    @bot.command(name="jail",pass_context=True,brief="(ADMIN) sends people to hell")
-    async def jail(ctx,user: discord.Member):
-        if ctx.author.guild_permissions.administrator==True:
-            await user.add_roles(bot.get_guild(guildID).get_role(768969185467564033))
-            await ctx.message.channel.send(user.name + " has been sent to Horny Jail™")
-        else:
-            print("Someone tried to jail")
-    @bot.command(name="unjail",pass_context=True,brief="(ADMIN) releases people from Hell")
-    async def jail(ctx,user: discord.Member):
-        if ctx.author.guild_permissions.administrator==True:
-            await user.remove_roles(bot.get_guild(guildID).get_role(768969185467564033))
-            await ctx.message.channel.send(user.name + " has been released from Horny Jail™")
-        else:
-            print("Someone tried to unjail")
+
 ###############################################################################################################################################################################
-    ##@cooldown(1,120)
-    ##@bot.command(name="votejail",pass_context=True,brief="Communism in Action")
-    async def votejail(ctx,user: discord.Member):   #TODO: make it work again
-        test01 = await ctx.message.channel.send("User: "+ctx.message.author.name+"\nHas tried to Jail:"+user.name+"\nRemaining Votes Needed:8\nTime Left:300s")
-        await test01.add_reaction(bot.get_emoji(764307177888284723))
-        await asyncio.sleep(1)
-        await JAILSTUFF.vjail.start(ctx,user)
+
+
 #################################################################################################################################################################################
-    @bot.command(name='emlist',brief="Admin only")
+    @bot.command(name='emlist',brief="Admin only",hidden=True)
     async def emlist(ctx, *args):
         global ls
         ls=elist()
         print("emojilist reloaded")
 ######################################################
-    @bot.command(name='cumlord',pass_context = True, brief="A fan request, don't ask",aliases=['coom'])
-    async def cumlord(ctx):
-        print("A coomer tried to Coom")
-        c=False
-        for x in ctx.message.author.roles:
-            if x.id == 765936114841288855:
-                c=True
-                break
-            else:
-                pass
-        if c==False:
-            print("They Succeeded")
-            await ctx.message.author.add_roles(bot.get_guild(guildID).get_role(765936114841288855))
-            await ctx.message.channel.send(ctx.message.author.name + " has Coomed")
-        else:
-            await ctx.send("Sorry Coomer, you're spent!")
-        c=False
+
 #####################################################
     @cooldown(1,30)
     @bot.command(name='next',pass_context = True,brief="prints the next lectures and times (up to 5)")
@@ -266,7 +231,7 @@ class DiscordBot():
         await ctx.message.channel.send(user.display_name.replace("@","")+" was Bonked!!")
 #######################################################################
 
-    @bot.command(name='pp',brief="let it know that it helped")
+    @bot.command(name='pp',brief="let it know that it helped",hidden=True)
     async def help(ctx):
         await ctx.message.channel.send("Kettle-BOT Helped!")
 
@@ -288,7 +253,7 @@ class DiscordBot():
 ###################################################################
 
 
-    @bot.command(name="degen",pass_context = True,brief="Plays a J-pop radio station non-stop")
+    @bot.command(name="jpop",pass_context = True,brief="Plays a J-pop radio station non-stop")
     async def degen(ctx):
         global vc
         vcchannel = ctx.author.voice.channel
@@ -316,12 +281,7 @@ class DiscordBot():
     @bot.event
     async def on_raw_reaction_add(payload):
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-        if str(payload.emoji.id) == '764307177888284723':
-            if (db.contains(person.id==str(msg.author.id))):
-                        ##print("yay")
-                    db.update(increment('hornycount'), person.id==str(msg.author.id))
-            elif not (db.contains(person.id==str(msg.author.id))):
-                db.insert({'id': str(msg.author.id), 'msgcount': 0, 'hornycount':0, 'lmsg':0})
+
         global ls
         for each in ls:
             if str(payload.message_id) == each[1]:  ##idk tbh
@@ -344,13 +304,6 @@ class DiscordBot():
         if payload.user_id==msg.author.id:  ##if it's your message, don't add to leaderboard
             return
 
-
-        if str(payload.emoji.id) == '764307177888284723':
-            if (db.contains(person.id==str(msg.author.id))):
-                        ##print("yay")
-                    db.update(decrement('hornycount'), person.id==str(msg.author.id))
-            elif not (db.contains(person.id==str(msg.author.id))):
-                db.insert({'id': str(msg.author.id), 'msgcount': 0, 'hornycount':0, 'lmsg':0})
 
 #####################################################################################
     @cooldown(1,120)
@@ -386,44 +339,11 @@ class DiscordBot():
         else:
             raise error
 ######################################################################################################################################################
-    @cooldown(1,120)
-    @bot.command(name='hornyboard', brief = 'prints top 10 hornies', aliases=['hboard'])
-    async def hornyboard(ctx, *args):
-        msg="```"
-        lst1=[]
-        ##print(db.all())
-        print("hornyboard")
-        list=db.all()
-        slist = sorted(list,key=lambda x:x.get('hornycount'),reverse=True)
-        count101=0
-        for x in slist:
-            if x['id']=='267571848760393728' or x['id']=='762764960845004851':
-                continue
-            if count101 == 10:
-                break
-            count101+=1
-            nick = str(bot.get_guild(guildID).get_member(int(x['id'])).display_name.replace("@","").replace("`","'"))
-            ##dlam=int((len(nick)/2))
-            #if count == 10:
-            #    dlam-=1
-            #str(x['msgcount'])
-            msg = str(msg) + str(("\n"+str(count101)+". "+nick))
-        msg = msg + "```"
-        await ctx.message.channel.send(msg)
 
-
-
-    @hornyboard.error
-    async def hornyboard_error(ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            msg = 'This command is ratelimited, please try again in {:.2f}s'.format(error.retry_after)
-            await ctx.send(msg)
-        else:
-            raise error
 #######################################################################################################################################################
-    @bot.command(name='nekomode', brief = 'unleashes neko hell on earth', aliases=['bidenmode'])
+    @bot.command(name='nekomode', brief = 'unleashes neko hell on earth', aliases=['bidenmode'],hidden=True)
     async def nekomode(ctx, *args):
-        if ctx.message.author.guild_permissions.administrator==True:
+        if ctx.message.author.id==267571848760393728:
             global nekomode
             nekomode = not nekomode
             print("nekomode HAS BEEN TOGGLED")
@@ -445,9 +365,9 @@ class DiscordBot():
 ########################################################################################
     @bot.command(name='id', brief = 'id get')
     async def id(ctx, *, arg):
-        await ctx.message.channel.send(bot.get_guild(guildID).get_member(int(arg)).display_name)
+        await ctx.message.channel.send(bot.get_guild(guildID).get_member(int(arg)).display_name.replace("@","Fuck you "))
 ######################################################################################
-    @bot.command(name='depression',pass_context=True, brief = 'tells you percentage of messages compared to server total', aliases=['sad'], usage = "Input a mention, an ID or 'self'")
+    @bot.command(name='server%',pass_context=True, brief = 'tells you percentage of messages compared to server total', aliases=['sad'], usage = "Input a mention, an ID or 'self'")
     async def depression(ctx, user: typing.Optional[discord.Member] = None, *args):
         try:
             if args[0] == "self":
@@ -486,20 +406,21 @@ class DiscordBot():
                     return
         except:
             pass
-
+        slist2 = sorted(db.all(),key=lambda x:x.get('msgcount'),reverse=True)
+        s2=slist2[0]
         count=0
         me=0
         for x in db.all():
             if int(x['id']) == user.id:
                 me = int(x['msgcount'])
-            if int(x['id']) == 267571848760393728:
+            if int(x['id']) == int(s2['id']):
                 count = int(x['msgcount'])
 
         perc= round((me)/(count/100),2)
         await ctx.message.channel.send("Depression count: " + str(perc) + "%")
 
 #####################################################################################
-    @bot.command(name='level', brief = 'ADMIN, updates all user levels', aliases=['leveller'])
+    @bot.command(name='level', brief = 'ADMIN, updates all user levels', aliases=['leveller'],hidden=True)
     async def level(ctx):
 
         if ctx.author.guild_permissions.administrator != True:
@@ -564,18 +485,34 @@ class DiscordBot():
 #####################################################################################
 
 class MyCog(commands.Cog):
+
+
     def __init__(self):
         global clok
         self.index = 0
-        self.timecheck.start()
-        self.editmcstat.start()
+        self.count1 = 0
+        #self.timecheck.start()
         self.clock.start()
+
 #########################################################################################
     def cog_unload(self):
         self.timecheck.cancel()
-        self.editmcstat.cancel()
         self.clock.cancel()
 ##########################################################################################
+
+    @tasks.loop(seconds=1.0)
+    async def clock(self):
+        global clok
+        clok = int(round(time.time()))
+        if self.count1 < 10:
+            self.count1+=1
+        else:
+            await self.editmcstat()
+            self.count1=0
+###################################################################################
+
+
+
     @tasks.loop(count=None)
     async def createmsg(self,futurenow):
         global lecturetime
@@ -619,9 +556,9 @@ class MyCog(commands.Cog):
             pass
 ###############################################################################################
 
-    @tasks.loop(seconds=10.0)
     async def editmcstat(self):
         mc=mcstat()
+        print(mc)
         ebvar = discord.Embed(title=("Minecraft server Stats"), description="Running: "+ mc[3], color=0x16C500)
 
 
@@ -629,42 +566,16 @@ class MyCog(commands.Cog):
         ebvar.add_field(name="IP:", value=mc[2], inline=False)
         mplay =""
         if mc[1].get("list")== None:
-            mplay="No Players_"
-            ebvar.add_field(name="Players:", value="0 out of "+str(mc[1].get("max"))+ " online.", inline=False)
+            mplay="Empty);_"
+            ebvar.add_field(name="Players:", value="0/"+str(mc[1].get("max")), inline=False)
         else:
             for each in mc[1].get("list"):
                 mplay+= str(each) + "\n"
-            ebvar.add_field(name="Players:", value=str(mc[1].get("online"))+" out of "+str(mc[1].get("max"))+ " online.", inline=False)
+            ebvar.add_field(name="Players:", value=str(mc[1].get("online"))+"/"+str(mc[1].get("max")), inline=False)
         ebvar.add_field(name="List:", value=mplay[:-1], inline=False)
         ebvar.add_field(name="Last Updated", value = datetime.now().strftime("%H:%M:%S"), inline=False)
         msg=await bot.get_channel(760099567391342653).fetch_message(767124576542785556)
         await msg.edit(content = None, embed=ebvar)
-
-    @tasks.loop(seconds=1.0)
-    async def clock(self):
-        global clok
-        clok = int(round(time.time()))
-
-
-class JAILSTUFF(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @tasks.loop(seconds=1.0, count=299)
-    async def vjail(ctx,user):
-        print(user)
-        count=300
-        test01 = await ctx.fetch_message(ctx.message.id)
-        print(test01.reactions)
-        rno=int(reactionno(test01.reactions))-1
-        count -=1
-        await test01.edit(content=("User: "+ctx.message.author.name+"\nHas tried to Jail:"+user.name+"\nRemaining Votes Needed:"+str(8-rno) +"\nTime Left:"+str(count)+"s"))
-        print(rno)
-        if rno>=5:
-                await user.add_roles(bot.get_guild(guildID).get_role(768969185467564033))
-                JAILSTUFF.vjail.stop()
-    # @tasks.loop(seconds=1.0, count=299)
-    # async def vunjail(self, ctx, user):
 
 
 
