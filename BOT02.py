@@ -558,7 +558,6 @@ class MyCog(commands.Cog):
 
     async def editmcstat(self):
         mc=mcstat()
-        print(mc)
         ebvar = discord.Embed(title=("Minecraft server Stats"), description="Running: "+ mc[3], color=0x16C500)
 
 
