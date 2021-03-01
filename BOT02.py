@@ -13,7 +13,7 @@ from icalparse import parse_ical
 from emojilist import elist
 from wakari import urlshort
 from mcstats import mcstat
-from levelparams import levelparams
+from levelparams import levelparams,nextpercent,lvup
 import asyncio
 from dotenv import load_dotenv
 from tinydb import TinyDB, Query, where
@@ -45,6 +45,7 @@ del urlkey[-1]
 
 future =[]
 tmpvar=""
+global lecturetime
 lecturetime=False
 
 global future6
@@ -56,6 +57,8 @@ person = Query()
 ## first is user ID, then count, then horny count, then last message time(lmsg)
 ####################################################################
 
+
+######################################################################
 def reactionno(list):
     for x in list:
         if x.emoji.id==764307177888284723:
@@ -71,31 +74,28 @@ def richifier(future6):  ## future 5 is [unix,online delivery,course desc, cours
         for x in urlkey:
             if x[0]==each[3]:
                 future6[count].append(x[1])
-        if each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Friday":    ##adds context to each lecture
-            future6[count][1]="Space Cadets, optional"
-            future6[count].append("https://teams.microsoft.com/l/channel/19%3aa96eb5721aef41099e19690b93c27ab7%40thread.tacv2/Space%2520Cadets%2520(Fri%252016-18)?groupId=143e2cc4-76a6-42e4-95d9-a25c1afd59f6&tenantId=4a5378f9-29f4-4d3e-be89-669d03ada9d8")                                                    ##ALSO adds the link to slot [5]
-        elif each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
-            future6[count][1]="FAQ Session"
-            future6[count].append("https://waa.ai/u6DT")
-        elif each[3]=="COMP1202" and datetime.fromtimestamp(each[0]).strftime("%A")=="Thursday":
-            future6[count][1]="Labs"
-            future6[count].append("https://waa.ai/u6D3")
-        elif each[3]=="COMP1215" and (datetime.fromtimestamp(each[0]).strftime("%A")=="Friday" or datetime.fromtimestamp(each[0]).strftime("%A")=="Monday"):
-            future6[count][1]="Excerise sheet help/Discussion"
-            future6[count].append("https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_190675_1&mode=view")
-        elif each[3]=="COMP1205"and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
-            future6[count][1]="Group Project with Sarah (meeting now on BB)"
-            future6[count].append("https://waa.ai/uNPW")
-        elif each[3]=="COMP1205":
-            future6[count][1]="see homepage for info (NO LINK TO MEETING (SHOULD BE ON TEAMS))"
-            future6[count].append("https://waa.ai/udrj")
-        elif each[3]=="COMP1203" and datetime.fromtimestamp(each[0]).strftime("%A")=="Friday":
-            future6[count][1]="Q&A session/summarise the week's lectures"
-            future6[count].append("https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_191256_1&mode=cpview")
-        elif each[3]=="COMP1203" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
-            future6[count][1]="To help with our RasPi coursework (ON THE BLACKBOARD)(STARTS AT 10AM not 9AM)(DONT CLICK THE LINK)"
-            future6[count].append("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        if each[3]=="COMP1201" and datetime.fromtimestamp(each[0]).strftime("%A")=="Friday":    ##adds context to each lecture at [5]
+            future6[count][1]="Tutorial for worksheet"
+            future6[count].append(str("[On Blackboard]("+"https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_191254_1"+")"))                                                    ##ALSO adds the link to slot [5]
+        elif each[3]=="COMP1201":
+            future6[count][1]="Normal Lecture"
+            future6[count].append("[On Blackboard]("+"https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_191254_1"+")")
+        elif each[3]=="COMP1204":
+            future6[count][1]="Normal Lecture"
+            future6[count][2]="COMP1204 - Data Management"
+            future6[count].append("[Hosted on Panopto, check here for link]("+"https://discord.com/channels/738368497738055743/803620960073678859"+")")
+        elif each[3]=="COMP1206":
+            future6[count][1]="Normal Lab"
+            future6[count].append("[Hosted on Panopto, check here for link]("+"https://ptb.discord.com/channels/738368497738055743/806252265026617359"+")")
+        elif each[3]=="COMP1216" and datetime.fromtimestamp(each[0]).strftime("%A")=="Monday":
+            future6[count][1]="Problem Class"
+            future6[count].append("[Normally on Teams]("+"https://teams.microsoft.com/l/channel/19%3a1fd7ea69486b493cae35cf70015dbaa4%40thread.tacv2/Problem%2520Classes?groupId=2b0f1a80-ac88-4cdd-9368-71d0b6566117&tenantId=4a5378f9-29f4-4d3e-be89-669d03ada9d8"+")")
+        elif each[3]=="COMP1216":
+            future6[count][1]="Normal Lecture"
+            future6[count].append("[On Blackboard]("+"https://blackboard.soton.ac.uk/webapps/collab-ultra/tool/collabultra?course_id=_190676_1"+")")
         else:
+            future6[count][1]="This is Brokey"
+            future6[count].append("""[Don't Do It!](https://www.youtube.com/watch?v=dbn-QDttWqU)""")
             continue
     return future6
 ###################################################################
@@ -115,14 +115,14 @@ class DiscordBot():
     async def on_message(message):
         #print(clok)
         ##return  ##TODO: REMOVE this when going back online #####################################################################################
-        if message.author == bot.user or message.channel.id == 769348852591231027:
+        if message.author == bot.user or message.channel.id == 769348852591231027:# or (not message.author.guild_permissions.administrator): ##TODO: UNDO AFTER CHANGES
             return
         elif random.randint(0,6900) == 42:
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
 
         if (db.contains(person.id==str(message.author.id))):
-            if (db.get(person.id==str(message.author.id)).get('lmsg')-round(time.time())<= -3):
+            if (db.get(person.id==str(message.author.id)).get('lmsg')-round(time.time())<= -5):
                 ##print("yay")
                 db.update(increment('msgcount'), person.id==str(message.author.id))
                 db.update(set('lmsg',round(time.time())),person.id==str(message.author.id))
@@ -132,6 +132,24 @@ class DiscordBot():
             ##print("nay")
         if  "||" not in message.clean_content:
             await bot.process_commands(message)
+
+
+
+        if lvup(int(db.get(person.id==str(message.author.id)).get('msgcount'))):
+            print("levelling")
+            embed = discord.Embed(description=str(message.author.mention)+" "+"("+str(message.author.display_name)+") "+" has levelled up from " +str(int(levelparams(db.get(person.id==str(ctx.author.id)).get('msgcount')))-1) + " to "+str(levelparams(db.get(person.id==str(ctx.author.id)).get('msgcount'))), color=0xff00aa)
+
+            embed.set_author(name=message.author.display_name)
+            embed.set_thumbnail(url=str(message.author.avatar_url))
+            await bot.get_channel(768156094715265124).send(embed=embed1)
+            await sololevel(int(message.author.id))
+
+
+
+
+
+
+
 
         global nekomode
         if nekomode == True:
@@ -202,7 +220,7 @@ class DiscordBot():
             if count > no:
                 continue
             else:
-                string10=(string10+("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%H:%M %d-%m-%Y')+"\nLecture: "+str(x[2]))+"\n")
+                string10+=(("Date: "+datetime.utcfromtimestamp(x[0]).strftime('%H:%M %d-%m-%Y')+"\nLecture: "+str(x[2]))+"\n\n")
         await ctx.message.channel.send(string10)
     @next.error
     async def next_error(ctx, error):
@@ -269,7 +287,7 @@ class DiscordBot():
             await ctx.send('User is not in a channel')
 ###################################################################
 
-    @bot.command(name="leave",pass_context = True,brief="leaves")
+    @bot.command(name="leave",pass_context = True,aliases=["dc"],brief="leaves")
     async def leave(ctx):
         global vc
         await vc.disconnect()
@@ -432,9 +450,8 @@ class DiscordBot():
             if int(x['id']) < 100:
                 break
 
-            await asyncio.sleep(0.2)
+            #await asyncio.sleep(0.2)
             print("levelling: " + x['id'])
-            ulevel=0
             member00=bot.get_guild(guildID).get_member(int(x['id']))
             memberlv=levelparams(int(x['msgcount']))
             currentlv=0
@@ -481,6 +498,150 @@ class DiscordBot():
                 print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
             else:
                 print("Go cry to mommy")
+
+
+
+
+
+    async def sololevel(id):
+
+
+        msgno = (db.get(person.id==str(id)).get('msgcount'))
+        if int(id)==267571848760393728 or int(id)==235088799074484224:
+            return
+        if int(msgno) < 100:
+            return
+
+            #await asyncio.sleep(0.2)
+            print("levelling: " + bot.get_guild(guildID).get_member(int(x['id'])).display_name)
+            member00=bot.get_guild(guildID).get_member(int(id))
+            memberlv=levelparams(int(msgno))
+            currentlv=0
+            ids = []
+            if member00 is None:
+                db.remove(person.id == str(id))
+                return
+            for each in member00.roles:
+                ids.append(each.id)
+            if 776845468126019594 in ids:
+                currentlv=1
+            elif 776856319261016074 in ids:
+                currentlv=2
+            elif 776856505269092403 in ids:
+                currentlv=3
+            elif 776856581551292448 in ids:
+                currentlv=4
+            elif 776856620981944331 in ids:
+                currentlv=5
+            else:
+                currentlv=0
+            if currentlv==memberlv:
+                return
+            elif memberlv==0:
+                return
+            elif memberlv == 1:
+                await member00.add_roles(bot.get_guild(guildID).get_role(776845468126019594))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
+            elif memberlv == 2:
+                await member00.remove_roles(bot.get_guild(guildID).get_role(776845468126019594))
+                await member00.add_roles(bot.get_guild(guildID).get_role(776856319261016074))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
+            elif memberlv == 3:
+                await member00.remove_roles(bot.get_guild(guildID).get_role(776856319261016074))
+                await member00.add_roles(bot.get_guild(guildID).get_role(776856505269092403))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
+            elif memberlv == 4:
+                await member00.remove_roles(bot.get_guild(guildID).get_role(776856505269092403))
+                await member00.add_roles(bot.get_guild(guildID).get_role(776856581551292448))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
+            elif memberlv == 5:
+                await member00.remove_roles(bot.get_guild(guildID).get_role(776856581551292448))
+                await member00.add_roles(bot.get_guild(guildID).get_role(776856620981944331))
+                print(bot.get_guild(guildID).get_member(int(x['id'])).display_name+"  levelled up from " +str(currentlv) + " to "+str(memberlv))
+            else:
+                print("Go cry to mommy")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @bot.command(name='progress', brief = '''tells you how far you've got to go''', aliases=['prog'])
+    async def progress(ctx):
+        percent = (round(nextpercent(db.get(person.id==str(ctx.author.id)).get('msgcount'))*100,1))
+        next_lvl=levelparams(db.get(person.id==str(ctx.author.id)).get('msgcount'))
+        level=next_lvl
+        next_lvl+=1
+
+
+
+        bar = "["
+        for x in range(round(int(percent)/5)):
+            bar+=str("▇")
+        while len(bar)<21:
+            bar+=str("—")
+        bar+=str("]")
+        if next_lvl>5:
+            percent=42.0
+            next_lvl="∞"
+        embed1=discord.Embed(description=str(percent) + """% towards level """+ str(next_lvl)+"!" , color=0xff00aa).add_field(name="Bar:",value=bar,inline=True)
+
+        embed1.set_author(name=ctx.author.display_name)
+        embed1.set_thumbnail(url=str(ctx.author.avatar_url))
+        await ctx.channel.send(embed=embed1)
+
 #####################################################################################
 #####################################################################################
 
@@ -491,7 +652,7 @@ class MyCog(commands.Cog):
         global clok
         self.index = 0
         self.count1 = 0
-        #self.timecheck.start()
+        self.count2 = 0
         self.clock.start()
 
 #########################################################################################
@@ -509,6 +670,11 @@ class MyCog(commands.Cog):
         else:
             await self.editmcstat()
             self.count1=0
+        if self.count2<60:
+            self.count2+=1
+        else:
+            await self.timecheck()
+            self.count2=0
 ###################################################################################
 
 
@@ -517,42 +683,38 @@ class MyCog(commands.Cog):
     async def createmsg(self,futurenow):
         global lecturetime
         embedVar = discord.Embed(title=("Lecture: "+ futurenow[2] + "  in "+str(round(((time.time()-futurenow[0])/60)))+ "mins"), description=futurenow[1], color=0x16C500)
-        embedVar.add_field(name="Course Homepage", value="[HERE]"+"("+("https://waa.ai/"+urlshort(str(futurenow[4])))+")", inline=False)
-        embedVar.add_field(name="Online Lecture Location", value="[Click here to go to the Lecture (if available)]"+"("+("https://waa.ai/"+urlshort(str(futurenow[5])))+")", inline=False)
-        if futurenow[3]=="COMP1202":
-            embedVar.set_thumbnail(url="https://i.imgur.com/eRgMUFx.png")
-            embedVar.add_field(name="For more info please go to", value="""<#764590654448861185>""", inline=False)
-        elif futurenow[3]=="COMP1203":
-            embedVar.set_thumbnail(url="https://i.imgur.com/TR6iwwz.png")
-            embedVar.add_field(name="For more info please go to", value="""<#764590676049395723>""", inline=False)
-        elif futurenow[3]=="COMP1205":
-            embedVar.set_thumbnail(url="https://i.imgur.com/3l2tbv7.gif")
-            embedVar.add_field(name="For more info please go to", value="""<#764590696128446484>""", inline=False)
-        elif futurenow[3]=="COMP1215":
-            embedVar.set_thumbnail(url="https://i.imgur.com/bFvcT3Y.png")
-            embedVar.add_field(name="For more info please go to", value="""<#764590723545694248>""", inline=False)
+        x=str("["+str(futurenow[3])+"]"+"("+str(futurenow[4])+")")
+        embedVar.add_field(name="Course Notes Homepage", value=x, inline=False)
+        y=futurenow[5]
+        embedVar.add_field(name="Online Lecture Location", value=y, inline=False)
+        if futurenow[3]=="COMP1201":
+            embedVar.set_thumbnail(url="https://i.imgur.com/9xkxKdk.png")
+        elif futurenow[3]=="COMP1204":
+            embedVar.set_thumbnail(url="https://i.imgur.com/uALzttv.png")
+        elif futurenow[3]=="COMP1206":
+            embedVar.set_thumbnail(url="https://i.imgur.com/o5GP9aT.png")
+        elif futurenow[3]=="COMP1216":
+            embedVar.set_thumbnail(url="https://i.imgur.com/9JwDYfS.png")
         else:
             embedVar.set_thumbnail(url="https://i.imgur.com/8LQCEa7.png")
-            embedVar.add_field(name="For more info please go to", value="""<#762719395763322960>""", inline=False)
-        await bot.get_channel(764657412585816084).send(content="""Dear <@&764601237986738197>,""",embed=embedVar)
+        await bot.get_channel(764657412585816084).send(content="""Dear <@&764601237986738197>, """,embed=embedVar)
         await asyncio.sleep(600)
         lecturetime=False
         self.createmsg.stop()
 #####################################################################################################
 
-    @tasks.loop(seconds=60.0)
     async def timecheck(self):
-        global lecturetime
         global future,future5,lecturetime,future6
         future=[]
         future=parse_ical()
         future=richifier(future)
-        #print(future)
-        if future[0][0]-int(time.time())<=600 and future[0][0]-int(time.time())>0 and lecturetime==False:
+
+        if (future[0][0]-int(time.time())<=600) and future[0][0]-int(time.time())>0 and lecturetime==False:
             lecturetime=True
             print("lecture")
             self.createmsg.start(future[0])
         else:
+            print(future[0][0]-int(time.time()))
             pass
 ###############################################################################################
 

@@ -19,7 +19,7 @@ def parse_ical():
     global time001
     global ical03
     time001=int(time.time())
-    ical00 = open("ical01.ics").read().split("\n")
+    ical00 = open("ical02.ics").read().split("\n")
     del ical00[0:6]
     ical01=[]
     ical02=[]
@@ -49,14 +49,20 @@ def parse_ical():
             ical03[v2][v3]=y[y.find(":")+1:]
         if search("COMP",x1[2]):
             ical03[v2].append(x1[2][0:8])
-        elif search("Foundations",x1[2]):
-            ical03[v2].append("COMP1215")
+        elif search("Software",x1[2]):
+            ical03[v2].append("COMP1216")
         elif search("Programming",x1[2]):
-            ical03[v2].append("COMP1202")
-        elif search("Professional",x1[2]):
-            ical03[v2].append("COMP1205")
+            ical03[v2].append("COMP1206")
+        elif search("Data",x1[2]):
+            ical03[v2].append("COMP1204")
         else:
             ical03[v2].append("")
+
+
+
+    for x in ical03:        #removes the L's
+        x[2] = x[2][:8] + x[2][11:]
+
     ##time zone convert
 ##add a custom event
     ical03.append(open("TESTLECTURE.csv",mode="r").read().split("\n")[1].split(","))
@@ -70,6 +76,7 @@ def parse_ical():
             future.append(a)
 
     future=sorted(future,key = sortbystring)
-    future=future[0:5]
+    future=future[0:4]
+
 
     return future    ##returns as [unix,online delivery,course desc, course code] including text or custom lecture
