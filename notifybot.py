@@ -108,13 +108,13 @@ class MyCog(commands.Cog):
         embedVar = discord.Embed(title=("Lecture: "+ futurenow[2] + "  in "+str(round(((time.time()-futurenow[0])/60)))+ "mins"), description=futurenow[1], color=0x16C500)
         embedVar.add_field(name="Course Homepage", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[4]))+")", inline=False)
         embedVar.add_field(name="Online Lecture Location", value="[HERE]"+"("+("https://waa.ai/"+urlshort(futurenow[5]))+")", inline=False)
-        if futurenow[3]=="COMP1202"
+        if futurenow[3]=="COMP1202":
             embedVar.set_thumbnail(url="https://i.imgur.com/eRgMUFx.png")
-        elif futurenow[3]=="COMP1203"
+        elif futurenow[3]=="COMP1203":
             embedVar.set_thumbnail(url="https://i.imgur.com/TR6iwwz.png")
-        elif futurenow[3]=="COMP1205"
+        elif futurenow[3]=="COMP1205":
             embedVar.set_thumbnail(url="https://i.imgur.com/HMTSDDb.png")
-        elif futurenow[3]=="COMP1215"
+        elif futurenow[3]=="COMP1215":
             embedVar.set_thumbnail(url="https://i.imgur.com/bFvcT3Y.png")
         await bot.get_channel(762778215286177824).send(embed=embedVar)
         time.sleep(600)
