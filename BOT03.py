@@ -501,8 +501,9 @@ class DiscordBot():
         global timers
         inp = args[0].split(":")
         secs = 0
-        num=abs(x[0:-1])
+
         for x in inp:
+                    num=abs(x[0:-1])
             if x[-1] == "s":
                 secs += int(num)
             elif x[-1] == "m":
