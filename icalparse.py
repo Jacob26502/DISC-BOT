@@ -2,12 +2,13 @@ from re import search
 from dateutil import parser as parser
 import datetime
 import time
+import os
 global time001
 global ical03
 time001=int(time.time())
 global future
 future=[]
-
+script_dir = os.path.dirname(__file__)
 
 
 
@@ -19,7 +20,7 @@ def parse_ical():
     global time001
     global ical03
     time001=int(time.time())
-    ical00 = open("ical02.ics").read().split("\n")
+    ical00 = open(os.path.join(script_dir,"ical03.ics")).read().split("\n")
     del ical00[0:6]
     ical01=[]
     ical02=[]
@@ -39,7 +40,7 @@ def parse_ical():
             continue
 
     for z in ical02:    #TODO NEED TO CHANGE NEXT TERM
-        if ((z[1] != "LOCATION:Online Delivery") or (search("Weekly Tutorial",z[2])!=None) or (search("ELEC",z[2])!=None)):
+        if ((z[1] != "LOCATION:Online Delivery") or (search("Weekly Tutorial",z[2])!=None) or (search("ELEC",z[2])!=None) or (search("Sign-Up",z[2])!=None)):
             continue
         else:
             ical03.append(z)
@@ -65,7 +66,7 @@ def parse_ical():
 
     ##time zone convert
 ##add a custom event
-    ical03.append(open("TESTLECTURE.csv",mode="r").read().split("\n")[1].split(","))
+    ical03.append(open(os.path.join(script_dir,"TESTLECTURE.csv"),mode="r").read().split("\n")[1].split(","))
     global future
     future=[]
     ##return all events in the future

@@ -34,9 +34,9 @@ global clok
 global nekomode
 global nekohook
 nekomode = ""
-
+script_dir = os.path.dirname(__file__)
 #################################################################
-urlfile = open("urlkey.csv", mode="r").read().split("\n")
+urlfile = open(os.path.join(script_dir,"urlkey.csv"), mode="r").read().split("\n")
 urlkey = []
 for x in urlfile:
     urlkey.append(x.split(","))
@@ -51,9 +51,10 @@ lecturetime = False
 global future6
 #################################################################
 global db, person
-db = TinyDB('db.json')
+db = TinyDB(os.path.join(script_dir,'db.json'))
 person = Query()
-
+global timers
+timers = [[0,0000000]]
 
 ##DATABASE
 ## first is user ID, then count, then horny count, then last message time(lmsg)
@@ -204,7 +205,10 @@ class DiscordBot():
             print("Someone got Lucky")
             await message.channel.send("Kettle-BOT is always watching")
 
-
+        if message.author.id == 267571848760393728 and ("==" in message.clean_content):
+            await message.channel.send("True")
+        if message.author.id == 267571848760393728 and ("!=" in message.clean_content):
+            await message.channel.send("False")
 
         if (db.contains(person.id == str(message.author.id))):
             if (db.get(person.id == str(message.author.id)).get('lmsg') - round(time.time()) <= -5):
@@ -358,7 +362,7 @@ class DiscordBot():
         channel = ctx.author.voice.channel
         if (channel != None):
             vc = await channel.connect()
-            vc.play(discord.FFmpegOpusAudio(source='Kettle.mp3', options='-filter:a "volume=0.1"'))
+            vc.play(discord.FFmpegOpusAudio(source=os.path.join(script_dir,'Kettle.mp3'), options='-filter:a "volume=0.1"'))
             ##player.start()
             while vc.is_playing():
                 await asyncio.sleep(1)  # sleeps while playing
@@ -433,7 +437,7 @@ class DiscordBot():
         for count, x in enumerate(slist):
             if x['id'] == '267571848760393728':
                 continue
-            if count == 11:
+            if count == 21:
                 break
             nick = str(bot.get_guild(guildID).get_member(int(x['id'])).display_name.replace("@", "").replace("`", "'"))
             ##dlam=int((len(nick)/2))
@@ -490,6 +494,37 @@ class DiscordBot():
         for x in str02:
             msg = (msg + " " + x)
         await ctx.message.channel.send(msg)
+    ########################################################################################
+
+    @bot.command(name='timer', brief='Countdown Timer',usage='2h:1d:3m        would be 1 day 2 hours 3 minutes (can use s/m/h/d with a number separated by colons)')
+    async def timer(ctx, *args):
+        global timers
+        inp = args[0].split(":")
+        secs = 0
+        num=abs(x[0:-1])
+        for x in inp:
+            if x[-1] == "s":
+                secs += int(num)
+            elif x[-1] == "m":
+                secs += (60 * num)
+            elif x[-1] == "h":
+                secs += (3600 * num)
+            elif x[-1] == "d":
+                secs += (86400 * num)
+        print(secs)
+        timers.append([int(time.time())+secs, ctx.message.author.id])
+        ctx.message.channel.send("Timer Set!")
+
+
+
+    @bot.command(name='timeReset', brief='''hidden, don't ask''', aliases=[''], hidden=True)
+    async def timeReset(ctx, *args):
+        if ctx.message.author.id == 267571848760393728:
+            global timers
+            timers = [[0,0000000]]
+
+
+
 
     ########################################################################################
     @bot.command(name='id', brief='id get')
@@ -502,15 +537,15 @@ class DiscordBot():
                  aliases=['sad'], usage='leave empty for self, Input, an ID or ''''self''''')
     async def depression(ctx, *args):
         user = None
-        if args[0] == "762764960845004851":
-            await ctx.message.channel.send("*whistles faintly*")
-            return
         try:
             if not args:
                 user = ctx.message.author
             elif args[0] == "self":
                 user = ctx.message.author
             elif user == None:
+                if args[0] == "762764960845004851":
+                    await ctx.message.channel.send("*whistles faintly*")
+                    return
                 try:
                     user = bot.get_guild(guildID).get_member(int(args[0]))
                 except (ValueError, TypeError):
@@ -535,15 +570,15 @@ class DiscordBot():
                  aliases=['lcomp'], usage='leave empty for self, Input, an ID or ''''self''''')
     async def depression(ctx, *args):
         user = None
-        if args[0] == "762764960845004851":
-            await ctx.message.channel.send("*whistles faintly*")
-            return
         try:
             if not args:
                 user = ctx.message.author
             elif args[0] == "self":
                 user = ctx.message.author
             elif user == None:
+                if args[0] == "762764960845004851":
+                    await ctx.message.channel.send("*whistles faintly*")
+                    return
                 try:
                     user = bot.get_guild(guildID).get_member(int(args[0]))
                 except (ValueError, TypeError):
@@ -551,6 +586,7 @@ class DiscordBot():
                     return
         except:
             pass
+
 
         slist2 = sorted(db.all(), key=lambda x: x.get('msgcount'), reverse=True)
         s2 = slist2[0]
@@ -635,15 +671,15 @@ class DiscordBot():
     @bot.command(name='progress', brief='leave empty for self, Input, an ID or ''''self''''', aliases=['prog'])
     async def progress(ctx, *args):
         user = None
-        if args[0] == "762764960845004851":
-            await ctx.message.channel.send("*whistles faintly*")
-            return
         try:
             if not args:
                 user = ctx.message.author
             elif args[0] == "self":
                 user = ctx.message.author
             elif user == None:
+                if args[0] == "762764960845004851":
+                    await ctx.message.channel.send("*whistles faintly*")
+                    return
                 try:
                     user = bot.get_guild(guildID).get_member(int(args[0]))
                 except (ValueError, TypeError):
@@ -677,6 +713,13 @@ class DiscordBot():
         await ctx.channel.send(embed=embed1)
 
 
+
+
+
+    @bot.command(name='test')
+    async def test(ctx, *args):
+        print(args)
+        await ctx.send('{} arguments: {}'.format(len(args), ', '.join(args)))
 #####################################################################################
 #####################################################################################
 
@@ -702,6 +745,7 @@ class MyCog(commands.Cog):
     @tasks.loop(seconds=1.0)
     async def clock(self):
         global clok
+        global timers
         clok = int(round(time.time()))
         global nekomode
         if self.count1 < 10:
@@ -714,6 +758,12 @@ class MyCog(commands.Cog):
         else:
             await self.timecheck()
             self.count2 = 0
+
+
+        for x in timers:
+            if clok == x[0]:
+                user = bot.get_user(x[1])
+                await user.send("Your timer is up!")
 
     ###################################################################################
 
